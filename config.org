@@ -14,6 +14,7 @@
   - [[#disabling-menu-bar-tool-bars-and-scroll-bar][Disabling Menu Bar, Tool Bars and Scroll Bar]]
   - [[#displaying-line-numbers-and-adding-line-wrap][Displaying Line Numbers and Adding Line Wrap]]
 - [[#org-mode][ORG MODE]]
+  - [[#setting-org-mode-directory][Setting Org Mode Directory]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
 - [[#which-key][WHICH-KEY]]
@@ -166,6 +167,10 @@ Making GNU Emacs look a little nicer
 (scroll-margin 12)
 #+end_src
 * ORG MODE
+** Setting Org Mode Directory
+#+begin_src emacs-lisp
+(setq org-directory '$HOME/Desktop/org_mode/)
+#+end_src
 ** Enabling Table of Contents
 #+begin_src emacs-lisp
 (use-package toc-org
