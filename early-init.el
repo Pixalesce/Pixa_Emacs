@@ -7,7 +7,4 @@
 ;; Homepage: https://github.com/Pixalesce/Pixa_Emacs
 ;; Package-Requires: ((emacs "24.3"))
 
-(org-babel-load-file
- (expand-file-name
-  "config.org"
-  user-emacs-directory))
+(setq package-enable-at-startup nil) ;;disables the standard package manager so it doesn't conflict with Elpaca
