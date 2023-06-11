@@ -1,29 +1,3 @@
-#+TITLE: Emacs config for Pixalesce
-#+AUTHOR: Pixalesce
-#+DESCRIPTION: The personal Emacs configuration of Pixalesce
-#+STARTUP: showeverything #unfolds the entire document on startup
-#+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
-
-* TABLE OF CONTENTS :toc:
-- [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
-  - [[#elpaca-package-manager][Elpaca Package Manager]]
-  - [[#load-evil-mode][Load Evil Mode]]
-  - [[#general-keybindings][General Keybindings]]
-- [[#fonts][FONTS]]
-- [[#gui-tweaks][GUI Tweaks]]
-  - [[#setting-theme][Setting Theme]]
-  - [[#disabling-start-up-message-add-warning][Disabling Start Up Message, Add Warning]]
-  - [[#disabling-menu-bar-tool-bars-and-scroll-bar][Disabling Menu Bar, Tool Bars and Scroll Bar]]
-  - [[#displaying-line-numbers-and-adding-line-wrap][Displaying Line Numbers and Adding Line Wrap]]
-- [[#org-mode][ORG MODE]]
-  - [[#setting-org-mode-directory][Setting Org Mode Directory]]
-  - [[#enabling-table-of-contents][Enabling Table of Contents]]
-  - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
-- [[#which-key][WHICH-KEY]]
-
-* TOP LEVEL PROGRAMS TO LOAD
-** Elpaca Package Manager
-#+begin_src emacs-lisp
 (defvar elpaca-installer-version 0.4)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
@@ -73,10 +47,7 @@
 
 ;; Don't install anything. Defer execution of BODY
 (elpaca nil (message "deferred"))
-#+end_src
 
-** Load Evil Mode
-#+begin_src emacs-lisp
 ;; Expands to: (elpaca evil (use-package evil :demand t))
 (use-package evil
   :init ;;for tweaking evil mode's configuraiton before loading it
@@ -93,10 +64,7 @@
   (evil-collection-init))
 
 (use-package evil-tutor) ;;adding in a vim tutor equivalent for evil mode
-#+end_src
 
-** General Keybindings
-#+begin_src emacs-lisp
 (use-package general
   :config
   (general-evil-setup)
@@ -116,14 +84,7 @@
     "bp" '(previous-buffer :wk "Previous buffer")
     "br" '(revert-buffer :wk "Reload buffer"))
 )
-#+end_src
 
-#+RESULTS:
-: t
-
-* FONTS
-Defining fonts that Emacs will use
-#+begin_src emacs-lisp
 (set-face-attribute 'default nil
   :font "FiraCode Nerd Font Mono"
   :height 160
@@ -149,53 +110,31 @@ Defining fonts that Emacs will use
 (add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font Mono-16"))
 
 (setq-default line-spacing 0.12)
-#+end_src
 
-#+RESULTS:
-: 0.12
-* GUI Tweaks
-Making GNU Emacs look a little nicer
-** Setting Theme
-#+begin_src emacs-lisp
 (load-theme 'modus-vivendi t)
-#+end_src
-** Disabling Start Up Message, Add Warning
-#+begin_src emacs-lisp
+
 (setq inhibit-startup-message t
       visible-bell t)
-#+end_src
-** Disabling Menu Bar, Tool Bars and Scroll Bar
-#+begin_src emacs-lisp
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-#+end_src
-** Displaying Line Numbers and Adding Line Wrap
-#+begin_src emacs-lisp
+
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
 (setq display-line-numbers-type 'relative)
 ;;(setq scroll-margin 12)
-#+end_src
-* ORG MODE
-** Setting Org Mode Directory
-#+begin_src emacs-lisp
+
 (setq org-directory '$HOME/Desktop/org_mode/)
-#+end_src
-** Enabling Table of Contents
-#+begin_src emacs-lisp
+
 (use-package toc-org
     :commands toc-org-enable
     :init (add-hook 'org-mode-hook 'toc-org-enable))
-#+end_src
-** Enabling Org Mode Bullets
-#+begin_src emacs-lisp
+
 (add-hook 'org-mode-hook 'org-indent-mode)
 (use-package org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-#+end_src
-* WHICH-KEY
-#+begin_src emacs-lisp
+
 (use-package which-key
   :init
     (which-key-mode 1)
@@ -213,7 +152,3 @@ Making GNU Emacs look a little nicer
         which-key-allow-imprecise-window-fit t
         which-key-separator " → "
         ))
-#+end_src
-
-#+RESULTS:
-: t
