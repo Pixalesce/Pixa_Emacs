@@ -9,5 +9,5 @@
 
 (org-babel-load-file
  (expand-file-name
-  "../.config/emacs/config.org"
+  "config/config.org"
   user-emacs-directory))

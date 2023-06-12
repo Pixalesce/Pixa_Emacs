@@ -8,18 +8,29 @@
 - [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
   - [[#elpaca-package-manager][Elpaca Package Manager]]
   - [[#load-evil-mode][Load Evil Mode]]
-  - [[#general-keybindings][General Keybindings]]
+  - [[#keybindings][Keybindings]]
+  - [[#end-keybindings][End Keybindings]]
 - [[#fonts][FONTS]]
 - [[#gui-tweaks][GUI Tweaks]]
   - [[#setting-theme][Setting Theme]]
+  - [[#set-theme-colours][Set Theme Colours]]
+  - [[#load-theme][Load Theme]]
   - [[#disabling-start-up-message-add-warning][Disabling Start Up Message, Add Warning]]
   - [[#disabling-menu-bar-tool-bars-and-scroll-bar][Disabling Menu Bar, Tool Bars and Scroll Bar]]
   - [[#displaying-line-numbers-and-adding-line-wrap][Displaying Line Numbers and Adding Line Wrap]]
+  - [[#highlight-current-line-disable-cursor-blink][Highlight Current Line, Disable Cursor Blink]]
+- [[#lsp-initialistion][LSP INITIALISTION]]
 - [[#org-mode][ORG MODE]]
   - [[#setting-org-mode-directory][Setting Org Mode Directory]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
 - [[#which-key][WHICH-KEY]]
+- [[#misc-behaviour][MISC BEHAVIOUR]]
+  - [[#mnibuffer-prompt-history][Mnibuffer Prompt History]]
+  - [[#restore-last-cursor-position][Restore Last Cursor Position]]
+  - [[#disable-ui-dialogs][Disable UI Dialogs]]
+  - [[#auto-refresh-files][Auto Refresh Files]]
+  - [[#recent-files][Recent Files]]
 
 * TOP LEVEL PROGRAMS TO LOAD
 ** Elpaca Package Manager
@@ -80,10 +91,10 @@
 ;; Expands to: (elpaca evil (use-package evil :demand t))
 (use-package evil
   :init ;;for tweaking evil mode's configuraiton before loading it
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
+  (setq evil-want-integration t
+        evil-want-keybinding nil
+        evil-vsplit-window-right t
+        evil-split-window-below t)
   (evil-mode))
 
 (use-package evil-collection
@@ -95,46 +106,57 @@
 (use-package evil-tutor) ;;adding in a vim tutor equivalent for evil mode
 #+end_src
 
-** General Keybindings
+** Keybindings
 #+begin_src emacs-lisp
-(use-package general
-  :config
-  (general-evil-setup)
+  (use-package general
+    :config
+    (general-evil-setup)
 
-  ;; setting up <SPACE> as global leader key
-  (general-create-definer dt/leader-keys
-    :states '(normal insert visual emacs)
-    :keymaps 'override
-    :prefix "SPC"
-    :global-prefix "M-SPC") ;;Meta-<SPACE> to access leader in insert mode
-
+    ;; setting up <SPACE> as global leader key
+    (general-create-definer dt/leader-keys
+      :states '(normal insert visual motion emacs)
+      :keymaps 'override
+      :prefix "SPC"
+      :global-prefix "M-SPC") ;;Meta-<SPACE> to access leader in insert mode
+#+end_src
+*** General
+#+begin_src emacs-lisp
+    (dt/leader-keys
+      "b" '(:ignore t :wk "buffer")
+      "bb" '(switch-to-buffer :wk "Switch buffer")
+      "bk" '(kill-this-buffer :wk "Kill this buffer")
+      "bn" '(next-buffer :wk "Next buffer")
+      "bp" '(previous-buffer :wk "Previous buffer")
+      "br" '(revert-buffer :wk "Reload buffer"))
+#+end_src
+*** File Navigation
+#+begin_src emacs-lisp
   (dt/leader-keys
-    "b" '(:ignore t :wk "buffer")
-    "bb" '(switch-to-buffer :wk "Switch buffer")
-    "bk" '(kill-this-buffer :wk "Kill this buffer")
-    "bn" '(next-buffer :wk "Next buffer")
-    "bp" '(previous-buffer :wk "Previous buffer")
-    "br" '(revert-buffer :wk "Reload buffer"))
-)
+      "f" '(:ignore t :wk "file")
+      "fr" '(recentf-open-files :wk "Recent files")
+   )
+#+end_src
+** End Keybindings
+#+begin_src emacs-lisp
+  )
 #+end_src
 
 #+RESULTS:
 : t
-
 * FONTS
 Defining fonts that Emacs will use
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil
-  :font "FiraCode Nerd Font Mono"
-  :height 160
+  :font "Victor Mono"
+  :height 180
   :weight 'medium)
 (set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
   :font "Helvetica"
-  :height 180
+  :height 200
   :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-  :font "FiraCode Nerd Font Mono"
-  :height 160
+  :font "Victor Mono"
+  :height 180
   :weight 'medium)
 
 ;; Makes commented text and keywords italics.
@@ -146,7 +168,7 @@ Defining fonts that Emacs will use
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
-(add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font Mono-16"))
+(add-to-list 'default-frame-alist '(font . "Victor Mono-18"))
 
 (setq-default line-spacing 0.12)
 #+end_src
@@ -157,7 +179,34 @@ Defining fonts that Emacs will use
 Making GNU Emacs look a little nicer
 ** Setting Theme
 #+begin_src emacs-lisp
-(load-theme 'modus-vivendi t)
+  (setq modus-themes-mode-line '(borderless) ;mode line
+        modus-themes-region '(bg-only) ;highlighting
+        modus-themes-completions '(moderate)) ;autocompletions
+
+  (setq modus-themes-bold-constructs t ;bold function names
+        modus-themes-italic-constructs t ;bold comments and stuff
+        modus-themes-paren-match '(bold intense) ;highlights parentheses
+        modus-themes-syntax '(alt-syntax green-strings yellow-comments) ;syntax style
+        modus-themes-fringes 'subtle
+        modus-themes-accented t
+        modus-themes-prompts '(bold intense))
+
+  (setq modus-themes-headings
+       '((1 . (rainbow 1.2))
+         (2 . (rainbow 1.15))
+         (3 . (rainbow 1.1))
+         (t . (rainbow semilight 1.05))) ;Headings settings
+       modus-themes-scale-headings t) ;Turn on headings scale
+
+  (setq modus-themes-org-blocks 'tinted-background) ;;highlight source blocks
+#+end_src
+** Set Theme Colours
+#+begin_src emacs-lisp
+  
+#+end_src
+** Load Theme
+#+begin_src emacs-lisp
+  (load-theme 'modus-vivendi t)
 #+end_src
 ** Disabling Start Up Message, Add Warning
 #+begin_src emacs-lisp
@@ -166,9 +215,10 @@ Making GNU Emacs look a little nicer
 #+end_src
 ** Disabling Menu Bar, Tool Bars and Scroll Bar
 #+begin_src emacs-lisp
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (icomplete-mode 1)
 #+end_src
 ** Displaying Line Numbers and Adding Line Wrap
 #+begin_src emacs-lisp
@@ -177,6 +227,13 @@ Making GNU Emacs look a little nicer
 (setq display-line-numbers-type 'relative)
 ;;(setq scroll-margin 12)
 #+end_src
+** Highlight Current Line, Disable Cursor Blink
+#+begin_src emacs-lisp
+  (global-hl-line-mode 1)
+  (add-hook 'org-agenda-finalize-hook #'hl-line-mode)
+  (blink-cursor-mode -1)
+#+end_src
+* LSP INITIALISTION
 * ORG MODE
 ** Setting Org Mode Directory
 #+begin_src emacs-lisp
@@ -217,3 +274,26 @@ Making GNU Emacs look a little nicer
 
 #+RESULTS:
 : t
+* MISC BEHAVIOUR
+** Mnibuffer Prompt History
+#+begin_src emacs-lisp
+  (setq history-length 25)
+  (savehist-mode 1)
+#+end_src
+** Restore Last Cursor Position
+#+begin_src emacs-lisp
+  (save-place-mode 1)
+#+end_src
+** Disable UI Dialogs
+#+begin_src emacs-lisp
+(setq use-dialog-box nil)
+#+end_src
+** Auto Refresh Files
+#+begin_src emacs-lisp
+  (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-buffers t)
+#+end_src
+** Recent Files
+#+begin_src emacs-lisp
+   (recentf-mode 1)
+#+end_src

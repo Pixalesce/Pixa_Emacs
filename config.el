@@ -51,10 +51,10 @@
 ;; Expands to: (elpaca evil (use-package evil :demand t))
 (use-package evil
   :init ;;for tweaking evil mode's configuraiton before loading it
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
+  (setq evil-want-integration t
+        evil-want-keybinding nil
+        evil-vsplit-window-right t
+        evil-split-window-below t)
   (evil-mode))
 
 (use-package evil-collection
@@ -71,31 +71,37 @@
 
   ;; setting up <SPACE> as global leader key
   (general-create-definer dt/leader-keys
-    :states '(normal insert visual emacs)
+    :states '(normal insert visual motion emacs)
     :keymaps 'override
     :prefix "SPC"
     :global-prefix "M-SPC") ;;Meta-<SPACE> to access leader in insert mode
 
-  (dt/leader-keys
-    "b" '(:ignore t :wk "buffer")
-    "bb" '(switch-to-buffer :wk "Switch buffer")
-    "bk" '(kill-this-buffer :wk "Kill this buffer")
-    "bn" '(next-buffer :wk "Next buffer")
-    "bp" '(previous-buffer :wk "Previous buffer")
-    "br" '(revert-buffer :wk "Reload buffer"))
+(dt/leader-keys
+  "b" '(:ignore t :wk "buffer")
+  "bb" '(switch-to-buffer :wk "Switch buffer")
+  "bk" '(kill-this-buffer :wk "Kill this buffer")
+  "bn" '(next-buffer :wk "Next buffer")
+  "bp" '(previous-buffer :wk "Previous buffer")
+  "br" '(revert-buffer :wk "Reload buffer"))
+
+(dt/leader-keys
+    "f" '(:ignore t :wk "file")
+    "fr" '(recentf-open-files :wk "Recent files")
+ )
+
 )
 
 (set-face-attribute 'default nil
-  :font "FiraCode Nerd Font Mono"
-  :height 160
+  :font "Victor Mono"
+  :height 180
   :weight 'medium)
 (set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
   :font "Helvetica"
-  :height 180
+  :height 200
   :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-  :font "FiraCode Nerd Font Mono"
-  :height 160
+  :font "Victor Mono"
+  :height 180
   :weight 'medium)
 
 ;; Makes commented text and keywords italics.
@@ -107,9 +113,32 @@
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
-(add-to-list 'default-frame-alist '(font . "FiraCode Nerd Font Mono-16"))
+(add-to-list 'default-frame-alist '(font . "Victor Mono-18"))
 
 (setq-default line-spacing 0.12)
+
+(setq modus-themes-mode-line '(borderless) ;mode line
+      modus-themes-region '(bg-only) ;highlighting
+      modus-themes-completions '(moderate)) ;autocompletions
+
+(setq modus-themes-bold-constructs t ;bold function names
+      modus-themes-italic-constructs t ;bold comments and stuff
+      modus-themes-paren-match '(bold intense) ;highlights parentheses
+      modus-themes-syntax '(alt-syntax green-strings yellow-comments) ;syntax style
+      modus-themes-fringes 'subtle
+      modus-themes-accented t
+      modus-themes-prompts '(bold intense))
+
+(setq modus-themes-headings
+     '((1 . (rainbow 1.2))
+       (2 . (rainbow 1.15))
+       (3 . (rainbow 1.1))
+       (t . (rainbow semilight 1.05))) ;Headings settings
+     modus-themes-scale-headings t) ;Turn on headings scale
+
+(setq modus-themes-org-blocks 'tinted-background) ;;highlight source blocks
+
+
 
 (load-theme 'modus-vivendi t)
 
@@ -119,11 +148,16 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(icomplete-mode 1)
 
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
 (setq display-line-numbers-type 'relative)
 ;;(setq scroll-margin 12)
+
+(global-hl-line-mode 1)
+(add-hook 'org-agenda-finalize-hook #'hl-line-mode)
+(blink-cursor-mode -1)
 
 (setq org-directory '$HOME/Desktop/org_mode/)
 
@@ -152,3 +186,15 @@
         which-key-allow-imprecise-window-fit t
         which-key-separator " → "
         ))
+
+(setq history-length 25)
+(savehist-mode 1)
+
+(save-place-mode 1)
+
+(setq use-dialog-box nil)
+
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
+
+(recentf-mode 1)
