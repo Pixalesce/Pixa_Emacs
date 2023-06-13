@@ -1,3 +1,5 @@
+(add-to-list 'image-types 'svg)
+
 (defvar elpaca-installer-version 0.4)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
@@ -65,9 +67,39 @@
 
 (use-package evil-tutor) ;;adding in a vim tutor equivalent for evil mode
 
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . efs/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  (setq lsp-inlay-hints-enable t)
+  :config
+  (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-treemacs
+:after lsp)
+
+(use-package lsp-ivy)
+
+(use-package rustic
+  ;; :mode "\\.rs\\"
+  :config
+    (require 'lsp-rust)
+    (setq lsp-rust-analyzer-completion-add-call-parenthesis nil)
+  :hook (rustic-mode . lsp-deferred))
+
 (use-package general
   :config
-  (general-evil-setup)
+  (general-evil-setup t)
 
   ;; setting up <SPACE> as global leader key
   (general-create-definer dt/leader-keys
@@ -90,6 +122,13 @@
  )
 
 )
+
+(use-package tree-sitter-langs)
+(use-package tree-sitter
+  :config
+  (require 'tree-sitter-langs)
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (set-face-attribute 'default nil
   :font "Victor Mono"
@@ -141,6 +180,13 @@
 
 
 (load-theme 'modus-vivendi t)
+(use-package command-log-mode)
+
+(use-package all-the-icons)
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 
 (setq inhibit-startup-message t
       visible-bell t)
@@ -198,3 +244,9 @@
 (setq global-auto-revert-non-file-buffers t)
 
 (recentf-mode 1)
+
+(use-package rainbow-delimiters
+:hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package evil-nerd-commenter
+:bind ("M-/" . evilnc-comment-or-uncomment-lines))

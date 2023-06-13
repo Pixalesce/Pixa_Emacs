@@ -8,18 +8,19 @@
 - [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
   - [[#elpaca-package-manager][Elpaca Package Manager]]
   - [[#load-evil-mode][Load Evil Mode]]
+  - [[#lsp-initialistion][LSP INITIALISTION]]
   - [[#keybindings][Keybindings]]
-  - [[#end-keybindings][End Keybindings]]
+  - [[#syntax-highlighting-treesitter][Syntax Highlighting (TreeSitter)]]
 - [[#fonts][FONTS]]
 - [[#gui-tweaks][GUI Tweaks]]
   - [[#setting-theme][Setting Theme]]
   - [[#set-theme-colours][Set Theme Colours]]
   - [[#load-theme][Load Theme]]
+  - [[#mode-line][Mode Line]]
   - [[#disabling-start-up-message-add-warning][Disabling Start Up Message, Add Warning]]
   - [[#disabling-menu-bar-tool-bars-and-scroll-bar][Disabling Menu Bar, Tool Bars and Scroll Bar]]
   - [[#displaying-line-numbers-and-adding-line-wrap][Displaying Line Numbers and Adding Line Wrap]]
   - [[#highlight-current-line-disable-cursor-blink][Highlight Current Line, Disable Cursor Blink]]
-- [[#lsp-initialistion][LSP INITIALISTION]]
 - [[#org-mode][ORG MODE]]
   - [[#setting-org-mode-directory][Setting Org Mode Directory]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
@@ -31,8 +32,13 @@
   - [[#disable-ui-dialogs][Disable UI Dialogs]]
   - [[#auto-refresh-files][Auto Refresh Files]]
   - [[#recent-files][Recent Files]]
+  - [[#rainbow-delimiters][Rainbow Delimiters]]
+  - [[#commenting][Commenting]]
 
 * TOP LEVEL PROGRAMS TO LOAD
+#+begin_src emacs-lisp
+(add-to-list 'image-types 'svg)
+#+end_src
 ** Elpaca Package Manager
 #+begin_src emacs-lisp
 (defvar elpaca-installer-version 0.4)
@@ -105,12 +111,52 @@
 
 (use-package evil-tutor) ;;adding in a vim tutor equivalent for evil mode
 #+end_src
+** LSP INITIALISTION
+*** Base set up
+#+begin_src emacs-lisp
+  (defun efs/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode))
 
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    :hook (lsp-mode . efs/lsp-mode-setup)
+    :init
+    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+    (setq lsp-inlay-hints-enable t)
+    :config
+    (lsp-enable-which-key-integration t))
+#+end_src
+*** LSP-UI
+#+begin_src emacs-lisp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+#+end_src
+*** LSP-treemacs
+#+begin_src emacs-lisp
+(use-package lsp-treemacs
+:after lsp)
+#+end_src
+*** LSP-ivy
+#+begin_src emacs-lisp
+(use-package lsp-ivy)
+#+end_src
+*** Rust Mode
+#+begin_src emacs-lisp
+(use-package rustic
+  ;; :mode "\\.rs\\"
+  :config
+    (require 'lsp-rust)
+    (setq lsp-rust-analyzer-completion-add-call-parenthesis nil)
+  :hook (rustic-mode . lsp-deferred))
+#+end_src
 ** Keybindings
 #+begin_src emacs-lisp
   (use-package general
     :config
-    (general-evil-setup)
+    (general-evil-setup t)
 
     ;; setting up <SPACE> as global leader key
     (general-create-definer dt/leader-keys
@@ -136,13 +182,19 @@
       "fr" '(recentf-open-files :wk "Recent files")
    )
 #+end_src
-** End Keybindings
+*** End Keybindings
 #+begin_src emacs-lisp
   )
 #+end_src
-
-#+RESULTS:
-: t
+** Syntax Highlighting (TreeSitter)
+#+begin_src emacs-lisp
+(use-package tree-sitter-langs)
+(use-package tree-sitter
+  :config
+  (require 'tree-sitter-langs)
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+#+end_src
 * FONTS
 Defining fonts that Emacs will use
 #+begin_src emacs-lisp
@@ -207,6 +259,15 @@ Making GNU Emacs look a little nicer
 ** Load Theme
 #+begin_src emacs-lisp
   (load-theme 'modus-vivendi t)
+  (use-package command-log-mode)
+#+end_src
+** Mode Line
+#+begin_src emacs-lisp
+(use-package all-the-icons)
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 #+end_src
 ** Disabling Start Up Message, Add Warning
 #+begin_src emacs-lisp
@@ -233,7 +294,6 @@ Making GNU Emacs look a little nicer
   (add-hook 'org-agenda-finalize-hook #'hl-line-mode)
   (blink-cursor-mode -1)
 #+end_src
-* LSP INITIALISTION
 * ORG MODE
 ** Setting Org Mode Directory
 #+begin_src emacs-lisp
@@ -296,4 +356,14 @@ Making GNU Emacs look a little nicer
 ** Recent Files
 #+begin_src emacs-lisp
    (recentf-mode 1)
+#+end_src
+** Rainbow Delimiters
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+:hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+** Commenting
+#+begin_src emacs-lisp
+(use-package evil-nerd-commenter
+:bind ("M-/" . evilnc-comment-or-uncomment-lines))
 #+end_src
