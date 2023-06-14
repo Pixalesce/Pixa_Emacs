@@ -2,9 +2,9 @@
 #+AUTHOR: Pixalesce
 #+Maintainer: Pixalesce <pixalesce@gmail.com>
 #+Created: June 10, 2023
-#+Modified: June 10, 2023
+#+Modified: June 14, 2023
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
-#+STARTUP: showeverything #unfolds the entire document on startup
+#+STARTUP: fold #folds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
 
 * TABLE OF CONTENTS :toc:
@@ -13,6 +13,7 @@
   - [[#loading-package-manager][Loading Package Manager]]
   - [[#load-evil-mode][Load Evil Mode]]
   - [[#completion-support-ivy][Completion Support (Ivy)]]
+  - [[#helpful][Helpful]]
   - [[#lsp-initialisation][LSP Initialisation]]
   - [[#keybindings][Keybindings]]
   - [[#syntax-highlighting-treesitter][Syntax Highlighting (TreeSitter)]]
@@ -37,8 +38,10 @@
   - [[#disable-ui-dialogs][Disable UI Dialogs]]
   - [[#auto-refresh-files][Auto Refresh Files]]
   - [[#recent-files][Recent Files]]
+  - [[#hydra][Hydra]]
   - [[#rainbow-delimiters][Rainbow Delimiters]]
   - [[#commenting][Commenting]]
+  - [[#scroll-settings][Scroll Settings]]
 
 * TOP LEVEL PROGRAMS TO LOAD
 #+begin_src emacs-lisp
@@ -73,19 +76,59 @@
 
 ** Load Evil Mode
 #+begin_src emacs-lisp
+  (defun pix/evil-hook ()
+    (dolist (mode '(custom-mode
+                    eshell-mode
+                    git-rebase-mode
+                    erc-mode
+                    sauron-mode
+                    term-mode))
+      (add-to-list 'evil-emacs-state-modes mode)))
 
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    :hook (evil-mode . pix/evil-hook)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (setq evil-collection-mode-list '(dashboard dired ibuffer))
+   j (evil-collection-init))
 #+end_src
 ** Completion Support (Ivy)
 #+begin_src emacs-lisp
   (use-package swiper :ensure t)
+  (use-package counsel :ensure t)
+  (use-package counsel
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; Disable searches starting with ^
   (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)	
-         ("C-l" . ivy-alt-done)
          ("C-h" . ivy-next-line)
          ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-alt-done)
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
          ("C-l" . ivy-done)
@@ -94,6 +137,22 @@
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill)))
   (ivy-mode 1)
+
+  (use-package ivy-rich)
+  (ivy-rich-mode 1)
+#+end_src
+** Helpful
+#+begin_src emacs-lisp
+(use-package helpful
+  :ensure t
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . 'counsel-describe-function)
+  ([remap describe-command] . 'helpful-command)
+  ([remap describe-variable] . 'counsel-describe-variable)
+  ([remap describe-key] . 'helpful-key))
 #+end_src
 ** LSP Initialisation
 *** Base set up
@@ -117,20 +176,31 @@
 
 #+end_src
 ** Keybindings
+*** General
 #+begin_src emacs-lisp
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make ESC quit prompts
+  (use-package general
+    :config
+    (general-create-definer pix/leader-keys
+      :keymaps '(normal insert visual motion emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
+
+    (pix/leader-keys
+      "t"  '(:ignore t :wk "toggles")
+      "tt" '(counsel-load-theme :wk "choose theme")))
 #+end_src
 *** Buffers
 #+begin_src emacs-lisp
-
+(general-define-key
+  "C-M-h" 'counsel-switch-buffer)
 #+end_src
 *** File Navigation
 #+begin_src emacs-lisp
 
 #+end_src
-*** End
+*** Misc
 #+begin_src emacs-lisp
-
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make ESC quit prompts
 #+end_src
 ** Syntax Highlighting (TreeSitter)
 #+begin_src emacs-lisp
@@ -144,31 +214,35 @@
 * FONTS
 Defining fonts that Emacs will use
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil
-  :font "Victor Mono"
-  :height 180
-  :weight 'medium)
-(set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
-  :font "Helvetica"
-  :height 200
-  :weight 'medium)
-(set-face-attribute 'fixed-pitch nil
-  :font "Victor Mono"
-  :height 180
-  :weight 'medium)
+  (set-face-attribute 'default nil
+    :font "Victor Mono"
+    :height 160
+    :weight 'medium)
+  (set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
+    :font "Helvetica"
+    :height 180
+    :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil
+    :font "Victor Mono"
+    :height 160
+    :weight 'medium)
 
-;; Makes commented text and keywords italics.
-(set-face-attribute 'font-lock-comment-face nil
-  :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil
-  :slant 'italic)
+  ;; Makes commented text and keywords italics.
+  (set-face-attribute 'font-lock-comment-face nil
+    :slant 'italic :weight 'light)
+  (set-face-attribute 'font-lock-keyword-face nil
+    :slant 'italic)
+  (set-face-attribute 'font-lock-function-name-face nil
+    :slant 'italic)
+  (set-face-attribute 'font-lock-variable-name-face nil
+    :slant 'italic)
 
-;; This sets the default font on all graphical frames created after restarting Emacs.
-;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
-;; are not right unless I also add this method of setting the default font.
-(add-to-list 'default-frame-alist '(font . "Victor Mono-18"))
+  ;; This sets the default font on all graphical frames created after restarting Emacs.
+  ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
+  ;; are not right unless I also add this method of setting the default font.
+  (add-to-list 'default-frame-alist '(font . "Victor Mono-16"))
 
-(setq-default line-spacing 0.12)
+  (setq-default line-spacing 0.12)
 #+end_src
 
 #+RESULTS:
@@ -202,18 +276,30 @@ Making GNU Emacs look a little nicer
 #+begin_src emacs-lisp
   
 #+end_src
+
 ** Load Theme
 #+begin_src emacs-lisp
-  (load-theme 'modus-vivendi t)
+ (load-theme 'modus-vivendi t)
 #+end_src
 ** Mode Line
 #+begin_src emacs-lisp
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :if (display-graphic-p)
+    :commands all-the-icons-install-fonts
+    :init
+    (unless (find-font (font-spec :name "all-the-icons"))
+      (all-the-icons-install-fonts t)))
+
+  (use-package all-the-icons-dired
+    :if (display-graphic-p)
+    :hook (dired-mode . all-the-icons-dired-mode))
 
   (use-package doom-modeline
     :ensure t
     :init (doom-modeline-mode 1)
-    :custom ((doom-modeline-height 40)))
+    :custom ((doom-modeline-height 40))
+    :config
+   (setq doom-modeline-modal-icon t)) 
 #+end_src
 ** Disabling Start Up Message, Add Warning
 #+begin_src emacs-lisp
@@ -301,6 +387,19 @@ Making GNU Emacs look a little nicer
 #+begin_src emacs-lisp
 (recentf-mode 1)
 #+end_src
+** Hydra
+#+begin_src emacs-lisp
+  (use-package hydra)
+
+  (defhydra hydra-text-scale (:timeout 4)
+    "scale text"
+    ("j" text-scale-increase "in")
+    ("k" text-scale-decrease "out")
+    ("f" nil "finished" :exit t))
+
+  (pix/leader-keys
+    "ts" '(hydra-text-scale/body :wk "scale text"))
+#+end_src
 ** Rainbow Delimiters
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
@@ -310,4 +409,14 @@ Making GNU Emacs look a little nicer
 #+begin_src emacs-lisp
 (use-package evil-nerd-commenter
 :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+** Scroll Settings
+#+begin_src emacs-lisp
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))
+        mouse-wheel-progressive-speed nil
+        scroll-setp 1
+        scroll-margin 10
+        scroll-conservatively 10000
+        scroll-preserve-screen-position 1)
+  (setq-default smooth-scroll-margin 0)
 #+end_src
