@@ -36,7 +36,6 @@
   (setq evil-want-C-i-jump nil)
   :hook (evil-mode . pix/evil-hook)
   :config
-  (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
@@ -45,12 +44,12 @@
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal))
-
+(evil-mode)
 (use-package evil-collection
   :after evil
   :config
   (setq evil-collection-mode-list '(dashboard dired ibuffer))
- j (evil-collection-init))
+  (evil-collection-init))
 
 (use-package swiper :ensure t)
 (use-package counsel :ensure t)
@@ -106,13 +105,13 @@
 (use-package general
   :config
   (general-create-definer pix/leader-keys
-    :keymaps '(normal insert visual motion emacs)
+    :keymaps '(normal insert visual emacs)
     :prefix "SPC"
-    :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
+    :global-prefix "C-SPC")) ;;Cntrl-<SPACE> to access leader in insert mode
 
   (pix/leader-keys
     "t"  '(:ignore t :wk "toggles")
-    "tt" '(counsel-load-theme :wk "choose theme")))
+    "tt" '(counsel-load-theme :wk "choose theme"))
 
 (general-define-key
   "C-M-h" 'counsel-switch-buffer)
@@ -199,7 +198,7 @@
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 40))
   :config
- (setq doom-modeline-modal-icon t))
+ (setq doom-modeline-modal-icon nil))
 
 (setq inhibit-startup-message t
       visible-bell t)
