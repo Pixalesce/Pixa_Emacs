@@ -14,16 +14,16 @@ The configuration will load up automatically on the initial load of Emacs, and t
 └── init.el
 ```
 ## Features
-\[✓\] Package Manager 
-\[✓\] Completion Support
-\[✓\] Evil Mode
-\[✓\] Fonts
-\[✓\] GUI Customisation
-\[✓\] Fonts
-\[ \] Project Management
-\[ \] Github Integration
-\[ \] Fonts
-\[ \] Org Mode Setup
-\[ \] LSP
-\[ \] File Management
-\[ \] Quality of Life
+☑ Package Manager<br>
+☑ Completion Support<br>
+☑ Evil Mode<br>
+☑ Fonts<br>
+☑ GUI Customisation<br>
+☑ Fonts<br>
+☐ Project Management<br>
+☐ Github Integration<br>
+☐ Fonts<br>
+☐ Org Mode Setup<br>
+☐ LSP<br>
+☐ File Management<br>
+☐ Quality of Life<br>
