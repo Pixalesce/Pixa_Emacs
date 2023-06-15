@@ -4,7 +4,7 @@
 #+Created: June 10, 2023
 #+Modified: June 15, 2023
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
-#+STARTUP: contents #folds the entire document on startup
+#+STARTUP: showeverything #unfolds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
 
 * TABLE OF CONTENTS :toc:

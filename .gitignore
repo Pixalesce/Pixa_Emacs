@@ -1,0 +1,15 @@
+##Files to be ignored in Git actions
+#Generated Config Files
+/config/*.el
+
+#Generated Files
+auto-save-list
+transient
+elpa
+
+history
+places
+recentf
+
+#Ignoring System Files
+.DS_Store
