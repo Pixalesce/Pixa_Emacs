@@ -93,7 +93,6 @@
     (setq evil-want-C-i-jump nil)
     :hook (evil-mode . pix/evil-hook)
     :config
-    (evil-mode 1)
     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
     (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
@@ -102,12 +101,12 @@
 
     (evil-set-initial-state 'messages-buffer-mode 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal))
-
+  (evil-mode)
   (use-package evil-collection
     :after evil
     :config
     (setq evil-collection-mode-list '(dashboard dired ibuffer))
-   j (evil-collection-init))
+    (evil-collection-init))
 #+end_src
 ** Completion Support (Ivy)
 #+begin_src emacs-lisp
@@ -115,27 +114,27 @@
   (use-package counsel :ensure t)
   (use-package counsel
   :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
-         ("C-x C-f" . counsel-find-file)
-         :map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history))
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
   :config
   (setq ivy-initial-inputs-alist nil)) ;; Disable searches starting with ^
   (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)	
-         ("C-h" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-alt-done)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill)))
+	 :map ivy-minibuffer-map
+	 ("TAB" . ivy-alt-done)	
+	 ("C-h" . ivy-next-line)
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-alt-done)
+	 :map ivy-switch-buffer-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-done)
+	 ("C-d" . ivy-switch-buffer-kill)
+	 :map ivy-reverse-i-search-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-d" . ivy-reverse-i-search-kill)))
   (ivy-mode 1)
 
   (use-package ivy-rich)
@@ -181,13 +180,13 @@
   (use-package general
     :config
     (general-create-definer pix/leader-keys
-      :keymaps '(normal insert visual motion emacs)
+      :keymaps '(normal insert visual emacs)
       :prefix "SPC"
-      :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
+      :global-prefix "C-SPC")) ;;Cntrl-<SPACE> to access leader in insert mode
 
     (pix/leader-keys
       "t"  '(:ignore t :wk "toggles")
-      "tt" '(counsel-load-theme :wk "choose theme")))
+      "tt" '(counsel-load-theme :wk "choose theme"))
 #+end_src
 *** Buffers
 #+begin_src emacs-lisp
@@ -299,7 +298,7 @@ Making GNU Emacs look a little nicer
     :init (doom-modeline-mode 1)
     :custom ((doom-modeline-height 40))
     :config
-   (setq doom-modeline-modal-icon t)) 
+   (setq doom-modeline-modal-icon nil))
 #+end_src
 ** Disabling Start Up Message, Add Warning
 #+begin_src emacs-lisp

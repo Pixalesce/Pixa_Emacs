@@ -1,0 +1,6 @@
+;;; -*- coding: utf-8; mode: lisp-data -*-
+(("/Users/basil/.emacs.d/config/config.org" . 9444)
+ ("/Users/basil/.emacs.d/elpa/evil-nerd-commenter-20221207.1245/evil-nerd-commenter-autoloads.el" . 5307)
+ ("/Users/basil/.emacs.d/elpa/rainbow-delimiters-20210515.1254/rainbow-delimiters-autoloads.el" . 1478)
+ ("/Users/basil/.emacs.d/elpa/hydra-20220910.1206/hydra-autoloads.el" . 2839)
+ ("/Users/basil/.emacs.d/elpa/lv-20200507.1518/lv-autoloads.el" . 418))
