@@ -1,8 +1,8 @@
-##Files to be ignored in Git actions
-#Generated Config Files
+## Files to be ignored in Git actions
+# Generated Config Files
 /config/*.el
 
-#Generated Files
+# Generated Files
 auto-save-list
 transient
 elpa
@@ -11,5 +11,8 @@ history
 places
 recentf
 
-#Ignoring System Files
+# Undo Tree Files
+*.~undo-tree~
+
+# Ignoring System Files
 .DS_Store

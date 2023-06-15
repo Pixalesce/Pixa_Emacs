@@ -26,4 +26,5 @@ The configuration will load up automatically on the initial load of Emacs, and t
 ☐ Org Mode Setup<br>
 ☐ LSP<br>
 ☐ File Management<br>
+☐ Dashboard<br>
 ☐ Quality of Life<br>
