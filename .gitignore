@@ -11,6 +11,8 @@ history
 places
 recentf
 
+*.*~
+
 # Undo Tree Files
 *.~undo-tree~
 
