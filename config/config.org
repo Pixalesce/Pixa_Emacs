@@ -46,6 +46,7 @@
 * TOP LEVEL PROGRAMS TO LOAD
 #+begin_src emacs-lisp
 (add-to-list 'image-types 'svg)
+(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; maximises window frame
 #+end_src
 ** Set Custom Variables Save Path
 #+begin_src emacs-lisp
