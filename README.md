@@ -20,7 +20,7 @@ The configuration will load up automatically on the initial load of Emacs, and t
 ☑ Fonts<br>
 ☑ GUI Customisation<br>
 ☑ Fonts<br>
-☐ Project Management<br>
+☑ Project Management<br>
 ☐ Github Integration<br>
 ☐ Fonts<br>
 ☐ Org Mode Setup<br>
