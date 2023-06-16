@@ -6,7 +6,7 @@ As ``user-emacs-directory`` differs by computer and operating system, do note th
 
 The configuration will load up automatically on the initial load of Emacs, and the configuration can be further personalised thereafter.
 
-### Visualisation of My File Structure
+### Visualisation of My Directory Tree
 ``` bash
 .emacs.d
 ├── config
