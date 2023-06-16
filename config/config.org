@@ -110,6 +110,9 @@
     (evil-set-initial-state 'messages-buffer-mode 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal))
   (evil-mode)
+
+  (use-package evil-tutor) ;;adding in a vim tutor equivalent for evil mode
+
   (use-package evil-collection
     :after evil
     :config
