@@ -18,6 +18,10 @@
   - [[#keybindings][Keybindings]]
   - [[#syntax-highlighting-treesitter][Syntax Highlighting (TreeSitter)]]
 - [[#fonts][FONTS]]
+- [[#projectile][Projectile]]
+- [[#github-integration][Github Integration]]
+  - [[#magit][Magit]]
+  - [[#forge][Forge]]
 - [[#gui-tweaks][GUI Tweaks]]
   - [[#setting-theme][Setting Theme]]
   - [[#set-theme-colours][Set Theme Colours]]
@@ -32,7 +36,7 @@
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
 - [[#which-key][WHICH-KEY]]
-- [[#misc-behaviour][MISC BEHAVIOUR]]
+- [[#quality-of-life][QUALITY OF LIFE]]
   - [[#minibuffer-prompt-history][Minibuffer Prompt History]]
   - [[#restore-last-cursor-position][Restore Last Cursor Position]]
   - [[#disable-ui-dialogs][Disable UI Dialogs]]
@@ -42,6 +46,7 @@
   - [[#rainbow-delimiters][Rainbow Delimiters]]
   - [[#commenting][Commenting]]
   - [[#scroll-settings][Scroll Settings]]
+  - [[#window-toggle][Window Toggle]]
 
 * TOP LEVEL PROGRAMS TO LOAD
 #+begin_src emacs-lisp
@@ -95,6 +100,7 @@
     :hook (evil-mode . pix/evil-hook)
     :config
     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-replace-state-map (kbd "C-g") 'evil-normal-state)
     (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
     (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -187,16 +193,18 @@
 ** Keybindings
 *** General
 #+begin_src emacs-lisp
-      (use-package general
-        :config
-        (general-create-definer pix/leader-keys
-          :keymaps '(normal insert visual emacs)
-          :prefix "SPC"
-          :global-prefix "C-SPC")) ;;Cntrl-<SPACE> to access leader in insert mode
+  (use-package general
+    :config
+    (general-create-definer pix/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
+    (general-create-definer pix/ctrl-c-keys
+      :prefix "C-c"))
 
-        (pix/leader-keys
-          "t"  '(:ignore t :wk "toggles")
-          "tt" '(counsel-load-theme :wk "choose theme"))
+    (pix/leader-keys
+      "t"  '(:ignore t :wk "toggles")
+      "tt" '(counsel-load-theme :wk "choose theme"))
 #+end_src
 *** Buffers
 #+begin_src emacs-lisp
@@ -256,6 +264,36 @@ Defining fonts that Emacs will use
 
 #+RESULTS:
 : 0.12
+* Projectile
+Better project library management
+#+begin_src emacs-lisp
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    ;; NOTE: Set this to the folder where you keep your Git repos!
+    (when (file-directory-p "~/Desktop")
+      (setq projectile-project-search-path '("~/Desktop")))
+    (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :config (counsel-projectile-mode))
+#+end_src
+* Github Integration
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)) ;open magit diff in the same window
+#+end_src
+** Forge
+#+begin_src emacs-lisp
+  (use-package sqlite3)
+  (use-package forge)
+#+end_src
 * GUI Tweaks
 Making GNU Emacs look a little nicer
 ** Setting Theme
@@ -358,7 +396,14 @@ Making GNU Emacs look a little nicer
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
 * WHICH-KEY
-* MISC BEHAVIOUR
+#+begin_src emacs-lisp
+  (use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1))
+#+end_src
+* QUALITY OF LIFE
 ** Minibuffer Prompt History
 #+begin_src emacs-lisp
 (setq history-length 25)
@@ -413,4 +458,35 @@ Making GNU Emacs look a little nicer
         scroll-conservatively 10000
         scroll-preserve-screen-position 1)
   (setq-default smooth-scroll-margin 0)
+#+end_src
+** Window Toggle
+#+begin_src emacs-lisp
+  (defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
+  (pix/ctrl-c-keys
+    "w" '(:ignore t :wk "window operators")
+    "ww" '(toggle-window-split :wk "toggle window split"))
 #+end_src
