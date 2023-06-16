@@ -2,7 +2,7 @@
 #+AUTHOR: Pixalesce
 #+Maintainer: Pixalesce <pixalesce@gmail.com>
 #+Created: June 10, 2023
-#+Modified: June 15, 2023
+#+Modified: June 17, 2023
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
 #+STARTUP: showeverything #unfolds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
@@ -45,6 +45,7 @@
   - [[#hydra][Hydra]]
   - [[#rainbow-delimiters][Rainbow Delimiters]]
   - [[#commenting][Commenting]]
+  - [[#spell-check][Spell Check]]
   - [[#scroll-settings][Scroll Settings]]
   - [[#window-toggle][Window Toggle]]
 
@@ -291,7 +292,12 @@ Better project library management
 #+end_src
 ** Forge
 #+begin_src emacs-lisp
-  (use-package sqlite3)
+  (setq auth-sources '("~/.authinfo.gpg"))
+  (require 'epa-file)
+  (custom-set-variables '(epg-gpg-program  "/usr/local/opt/gnupg@2.2/bin/gpg"))
+  (epa-file-enable)
+  (setq epa-pinentry-mode 'loopback)
+
   (use-package forge)
 #+end_src
 * GUI Tweaks
@@ -448,6 +454,11 @@ Making GNU Emacs look a little nicer
 #+begin_src emacs-lisp
 (use-package evil-nerd-commenter
 :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+** Spell Check
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 #+end_src
 ** Scroll Settings
 #+begin_src emacs-lisp
