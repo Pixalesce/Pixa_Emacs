@@ -1,0 +1,542 @@
+#+TITLE: Emacs config for Pixalesce
+#+AUTHOR: Pixalesce
+#+Maintainer: Pixalesce <pixalesce@gmail.com>
+#+Created: June 10, 2023
+#+Modified: June 17, 2023
+#+DESCRIPTION: The personal Emacs configuration of Pixalesce
+#+STARTUP: showeverything #unfolds the entire document on startup
+#+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
+
+* TABLE OF CONTENTS :toc:
+- [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
+  - [[#set-custom-variables-save-path][Set Custom Variables Save Path]]
+  - [[#loading-package-manager][Loading Package Manager]]
+  - [[#load-evil-mode][Load Evil Mode]]
+  - [[#completion-support-ivy][Completion Support (Ivy)]]
+  - [[#helpful][Helpful]]
+  - [[#lsp-initialisation][LSP Initialisation]]
+  - [[#keybindings][Keybindings]]
+  - [[#syntax-highlighting-treesitter][Syntax Highlighting (TreeSitter)]]
+- [[#projectile][Projectile]]
+- [[#github-integration][Github Integration]]
+  - [[#magit][Magit]]
+  - [[#forge][Forge]]
+- [[#gui-tweaks][GUI Tweaks]]
+  - [[#load-theme][Load Theme]]
+  - [[#fonts][FONTS]]
+  - [[#mode-line][Mode Line]]
+  - [[#disabling-start-up-message-add-warning][Disabling Start Up Message Add Warning]]
+  - [[#disabling-menu-bar-tool-bars-and-scroll-bar][Disabling Menu Bar, Tool Bars and Scroll Bar]]
+  - [[#displaying-line-numbers-and-adding-line-wrap][Displaying Line Numbers and Adding Line Wrap]]
+  - [[#highlight-current-line-disable-cursor-blink][Highlight Current Line, Disable Cursor Blink]]
+- [[#org-mode][ORG MODE]]
+  - [[#basic-setup][Basic Setup]]
+  - [[#org-font][Org Font]]
+  - [[#setting-org-directories][Setting Org Directories]]
+  - [[#org-agenda][Org Agenda]]
+  - [[#enabling-table-of-contents][Enabling Table of Contents]]
+  - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
+- [[#which-key][WHICH-KEY]]
+- [[#quality-of-life][QUALITY OF LIFE]]
+  - [[#minibuffer-prompt-history][Minibuffer Prompt History]]
+  - [[#restore-last-cursor-position][Restore Last Cursor Position]]
+  - [[#disable-ui-dialogs][Disable UI Dialogs]]
+  - [[#auto-refresh-files][Auto Refresh Files]]
+  - [[#recent-files][Recent Files]]
+  - [[#hydra][Hydra]]
+  - [[#rainbow-delimiters][Rainbow Delimiters]]
+  - [[#commenting][Commenting]]
+  - [[#spell-check][Spell Check]]
+  - [[#scroll-settings][Scroll Settings]]
+  - [[#window-toggle][Window Toggle]]
+
+* TOP LEVEL PROGRAMS TO LOAD
+#+begin_src emacs-lisp
+(add-to-list 'image-types 'svg)
+(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; maximises window frame
+#+end_src
+** Set Custom Variables Save Path
+#+begin_src emacs-lisp
+(setq custom-file (concat user-emacs-directory "config/custom.el"))
+(load custom-file 'noerror)
+#+end_src
+** Loading Package Manager
+*** Initialise Package Sources
+#+begin_src emacs-lisp
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+ (package-refresh-contents))
+#+end_src
+*** Initialise Package Sources
+#+begin_src emacs-lisp
+(unless (package-installed-p 'use-package)
+   (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+#+end_src
+
+** Load Evil Mode
+#+begin_src emacs-lisp
+  (defun pix/evil-hook ()
+    (dolist (mode '(custom-mode
+                    eshell-mode
+                    git-rebase-mode
+                    erc-mode
+                    sauron-mode
+                    term-mode))
+      (add-to-list 'evil-emacs-state-modes mode)))
+
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    :hook (evil-mode . pix/evil-hook)
+    :config
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-replace-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+  (evil-mode)
+
+  (use-package evil-tutor) ;;adding in a vim tutor equivalent for evil mode
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (setq evil-collection-mode-list '(dashboard dired ibuffer))
+    (evil-collection-init))
+  
+  ; Enables redo functionality
+  (use-package undo-tree
+    :ensure t
+    :after evil
+    :diminish
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode 1))
+#+end_src
+** Completion Support (Ivy)
+#+begin_src emacs-lisp
+  (use-package swiper :ensure t)
+  (use-package counsel :ensure t)
+  (use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; Disable searches starting with ^
+  (use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+	 :map ivy-minibuffer-map
+	 ("TAB" . ivy-alt-done)	
+	 ("C-h" . ivy-next-line)
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-alt-done)
+	 :map ivy-switch-buffer-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-done)
+	 ("C-d" . ivy-switch-buffer-kill)
+	 :map ivy-reverse-i-search-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-d" . ivy-reverse-i-search-kill)))
+  (ivy-mode 1)
+
+  (use-package ivy-rich)
+  (ivy-rich-mode 1)
+#+end_src
+** Helpful
+#+begin_src emacs-lisp
+(use-package helpful
+  :ensure t
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . 'counsel-describe-function)
+  ([remap describe-command] . 'helpful-command)
+  ([remap describe-variable] . 'counsel-describe-variable)
+  ([remap describe-key] . 'helpful-key))
+#+end_src
+** LSP Initialisation
+*** Base set up
+#+begin_src emacs-lisp
+
+#+end_src
+*** LSP-UI
+#+begin_src emacs-lisp
+
+#+end_src
+*** LSP-treemacs
+#+begin_src emacs-lisp
+
+#+end_src
+*** LSP-ivy
+#+begin_src emacs-lisp
+
+#+end_src
+*** Rust Mode
+#+begin_src emacs-lisp
+
+#+end_src
+** Keybindings
+*** General
+#+begin_src emacs-lisp
+  (use-package general
+    :config
+    (general-create-definer pix/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
+    (general-create-definer pix/ctrl-c-keys
+      :prefix "C-c"))
+
+    (pix/leader-keys
+      "t"  '(:ignore t :wk "toggles")
+      "tt" '(counsel-load-theme :wk "choose theme"))
+#+end_src
+*** Buffers
+#+begin_src emacs-lisp
+(general-define-key
+  "C-M-h" 'counsel-switch-buffer)
+#+end_src
+*** File Navigation
+#+begin_src emacs-lisp
+
+#+end_src
+*** Misc
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make ESC quit prompts
+#+end_src
+** Syntax Highlighting (TreeSitter)
+#+begin_src emacs-lisp
+(use-package tree-sitter-langs)
+(use-package tree-sitter
+  :config
+  (require 'tree-sitter-langs)
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+#+end_src
+* Projectile
+Better project library management
+#+begin_src emacs-lisp
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    ;; NOTE: Set this to the folder where you keep your Git repos!
+    (when (file-directory-p "~/Desktop")
+      (setq projectile-project-search-path '("~/Desktop")))
+    (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :config (counsel-projectile-mode))
+#+end_src
+* Github Integration
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)) ;open magit diff in the same window
+#+end_src
+** Forge
+#+begin_src emacs-lisp
+  (setq auth-sources '("~/.authinfo.gpg"))
+  (require 'epa-file)
+  (custom-set-variables '(epg-gpg-program  "/usr/local/opt/gnupg@2.2/bin/gpg"))
+  (epa-file-enable)
+  (setq epa-pinentry-mode 'loopback)
+
+  (use-package sqlite3)
+  (use-package forge)
+#+end_src
+* GUI Tweaks
+Making GNU Emacs look nicer
+** Load Theme
+#+begin_src emacs-lisp
+  (setq doom-themes-enable-bold t   
+      doom-themes-enable-italic t)
+  (load-theme 'doom-Iosvkem t)
+#+end_src
+** FONTS
+Defining fonts that Emacs will use
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+    :font "Victor Mono"
+    :height 160
+    :weight 'medium)
+  (set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
+    :font "Helvetica"
+    :height 180
+    :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil
+    :font "Victor Mono"
+    :height 160
+    :weight 'medium)
+
+  ;; Makes commented text and keywords italics.
+  (set-face-attribute 'font-lock-comment-face nil
+    :slant 'italic :weight 'light)
+  (set-face-attribute 'font-lock-keyword-face nil
+    :slant 'italic)
+  (set-face-attribute 'font-lock-function-name-face nil
+    :slant 'italic :weight 'bold)
+  (set-face-attribute 'font-lock-variable-name-face nil
+    :slant 'italic)
+
+  ;; This sets the default font on all graphical frames created after restarting Emacs.
+  ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
+  ;; are not right unless I also add this method of setting the default font.
+  (add-to-list 'default-frame-alist '(font . "Victor Mono-16"))
+
+  (setq-default line-spacing 0.12)
+#+end_src
+** Mode Line
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p)
+    :commands all-the-icons-install-fonts
+    :init
+    (unless (find-font (font-spec :name "all-the-icons"))
+      (all-the-icons-install-fonts t)))
+
+  (use-package all-the-icons-dired
+    :if (display-graphic-p)
+    :hook (dired-mode . all-the-icons-dired-mode))
+
+  ;; flash mode line
+  (use-package doom-themes
+    :config
+    (doom-themes-visual-bell-config))
+
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1)
+    :custom ((doom-modeline-height 40))
+    :config
+   (setq doom-modeline-modal-icon nil))
+#+end_src
+** Disabling Start Up Message Add Warning
+#+begin_src emacs-lisp
+(setq inhibit-startup-message t)
+;; (setq visible-bell t)
+#+end_src
+** Disabling Menu Bar, Tool Bars and Scroll Bar
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (icomplete-mode 1)
+#+end_src
+** Displaying Line Numbers and Adding Line Wrap
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode 1)
+  (global-visual-line-mode t)
+  (setq display-line-numbers-type 'relative)
+  ;;(setq scroll-margin 12)
+#+end_src
+** Highlight Current Line, Disable Cursor Blink
+#+begin_src emacs-lisp
+  (global-hl-line-mode 1)
+  (add-hook 'org-agenda-finalize-hook #'hl-line-mode)
+  (blink-cursor-mode -1)
+#+end_src
+* ORG MODE
+** Basic Setup
+#+begin_src emacs-lisp
+  (use-package evil-org)
+  (evil-org-mode 1)
+
+  (defun pix/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 0)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
+
+  (use-package org
+    :hook (org-mode . pix/org-mode-setup)
+    :config
+    (setq org-ellipsis " ▾"
+          org-hide-emphasis-markers t))
+#+end_src
+** Org Font
+#+begin_src emacs-lisp
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "❃"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.175)
+                  (org-level-3 . 1.15)
+                  (org-level-4 . 1.125)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.075)
+                  (org-level-7 . 1.05)
+                  (org-level-8 . 1.025)))
+    (set-face-attribute (car face) nil :font "Victor Mono" :weight 'medium :height (cdr face)))
+  
+    (set-face-attribute 'org-document-title nil :font "Victor Mono" :weight 'bold :height 240 :underline t) 
+    (set-face-attribute 'org-document-info nil :font "Victor Mono" :weight 'medium :height 220) 
+    (set-face-attribute 'org-document-info-keyword nil :font "Victor Mono" :weight 'semibold :height 180) 
+    (set-face-attribute 'org-link nil :font "Victor Mono" :weight 'light) 
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+#+end_src
+** Setting Org Directories
+#+begin_src emacs-lisp
+  (setq org-directory '~/Desktop/org_mode/)
+#+end_src
+** Org Agenda
+#+begin_src emacs-lisp
+  (setq org-agenda-start-with-log-mode t
+        org-log-done 'time
+        org-log-into-drawer t)
+
+  (setq org-agenda-files
+    '("~/Desktop/org_mode/agenda/sample_tasks.org"))
+#+end_src
+*** Custom Agenda Views
+#+begin_src emacs-lisp
+#+end_src
+** Enabling Table of Contents
+#+begin_src emacs-lisp
+(use-package toc-org
+    :commands toc-org-enable
+    :init (add-hook 'org-mode-hook 'toc-org-enable))
+#+end_src
+** Enabling Org Mode Bullets
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("✿" "⛿" "⛾" "⚘" "⅌" "☫" "❦" "❀" "♨" "☃" "⚛" "☢" "☣" "☠" "㊙" "㊗" "🌚")))
+#+end_src
+* WHICH-KEY
+#+begin_src emacs-lisp
+  (use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1))
+#+end_src
+* QUALITY OF LIFE
+** Minibuffer Prompt History
+#+begin_src emacs-lisp
+(setq history-length 25)
+(savehist-mode 1)
+#+end_src
+** Restore Last Cursor Position
+#+begin_src emacs-lisp
+(save-place-mode 1)
+#+end_src
+** Disable UI Dialogs
+#+begin_src emacs-lisp
+(setq use-dialog-box nil)
+#+end_src
+** Auto Refresh Files
+#+begin_src emacs-lisp
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
+#+end_src
+** Recent Files
+#+begin_src emacs-lisp
+(recentf-mode 1)
+#+end_src
+** Hydra
+#+begin_src emacs-lisp
+  (use-package hydra)
+
+  (defhydra hydra-text-scale (:timeout 4)
+    "scale text"
+    ("j" text-scale-increase "in")
+    ("k" text-scale-decrease "out")
+    ("f" nil "finished" :exit t))
+
+  (pix/leader-keys
+    "ts" '(hydra-text-scale/body :wk "scale text"))
+#+end_src
+** Rainbow Delimiters
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+:hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+** Commenting
+#+begin_src emacs-lisp
+(use-package evil-nerd-commenter
+:bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+** Spell Check
+#+begin_src emacs-lisp
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+#+end_src
+** Scroll Settings
+#+begin_src emacs-lisp
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))
+        mouse-wheel-progressive-speed nil
+        scroll-setp 1
+        scroll-margin 10
+        scroll-conservatively 10000
+        scroll-preserve-screen-position 1)
+  (setq-default smooth-scroll-margin 0)
+#+end_src
+** Window Toggle
+#+begin_src emacs-lisp
+  (defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
+  (pix/ctrl-c-keys
+    "w" '(:ignore t :wk "window operators")
+    "ww" '(toggle-window-split :wk "toggle window split"))
+#+end_src

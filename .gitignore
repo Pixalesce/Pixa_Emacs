@@ -1,0 +1,23 @@
+## Files to be ignored in Git actions
+# Generated Config Files
+/config/*.el
+
+# Generated Files
+auto-save-list
+transient
+elpa
+url
+
+history
+places
+recentf
+
+forge-database.sqlite
+projectile-bookmarks.eld
+*.*~
+
+# Undo Tree Files
+*.~undo-tree~
+
+# Ignoring System Files
+.DS_Store

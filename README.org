@@ -1,0 +1,32 @@
+#+title: Pixa Emacs
+#+PROPERTY: header-args:emacs-lisp
+Welcome to my personal Emacs configuration. Feel free to make a copy of my files to configure your own experience of emacs :)
+
+** Notes
+As ``user-emacs-directory`` differs by computer and operating system, do note that the location of your ``init.el`` might be placed in a different location. For me, ``user-emacs-directory`` is defaulted to ``.emacs.d``, so that's where my init file goes.
+
+*Org Mode setup*, including but not limited to org agenda and org capture template configurations, will be completed at a later date as it is not my current priority. I will probably look into more given time and greater familiarisation with Emacs.
+
+The configuration will load up automatically on the initial load of Emacs, and the configuration can be further personalised thereafter.
+
+*** Visualisation of My Directory Tree
+#+begin_src bash
+.emacs.d
+├── config
+│   └── config.org
+└── init.el
+#+end_src
+** Completed Features
+- Package Manager
+- Completion Support
+- Evil Mode
+- Fonts
+- Project Management
+- Github Integration
+** Ongoing Additions
+- LSP
+- File Management
+- Dashboard
+- Notion Integration
+- Org Mode Setup
+- Quality of Life
