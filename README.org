@@ -17,15 +17,16 @@ The configuration will load up automatically on the initial load of Emacs, and t
 └── init.el
 #+end_src
 ** Completed Features
--  Package Manager
--  Completion Support
--  Evil Mode
--  Fonts
--  Project Management
--  Github Integration
+- Package Manager
+- Completion Support
+- Evil Mode
+- Fonts
+- Project Management
+- Github Integration
 ** Ongoing Additions
--  Org Mode Setup
--  LSP
--  File Management
--  Dashboard
--  Quality of Life
+- LSP
+- File Management
+- Dashboard
+- Notion Integration
+- Org Mode Setup
+- Quality of Life
