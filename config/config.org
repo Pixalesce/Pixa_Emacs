@@ -32,6 +32,7 @@
   - [[#displaying-line-numbers-and-adding-line-wrap][Displaying Line Numbers and Adding Line Wrap]]
   - [[#highlight-current-line-disable-cursor-blink][Highlight Current Line, Disable Cursor Blink]]
 - [[#org-mode][ORG MODE]]
+  - [[#basic-setup][Basic Setup]]
   - [[#setting-org-mode-directory][Setting Org Mode Directory]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
@@ -322,8 +323,10 @@ Making GNU Emacs look a little nicer
 
   (setq modus-themes-headings
        '((1 . (rainbow 1.2))
-         (2 . (rainbow 1.15))
-         (3 . (rainbow 1.1))
+         (2 . (rainbow 1.175))
+         (3 . (rainbow 1.15))
+         (4 . (rainbow 1.125))
+         (5 . (rainbow 1.1))
          (t . (rainbow semilight 1.05))) ;Headings settings
        modus-themes-scale-headings t) ;Turn on headings scale
 
@@ -389,13 +392,31 @@ Making GNU Emacs look a little nicer
   (blink-cursor-mode -1)
 #+end_src
 * ORG MODE
+** Basic Setup
 #+begin_src emacs-lisp
   (use-package evil-org)
   (evil-org-mode 1)
+
+  (defun pix/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 0)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
+
+  (use-package org
+    :hook (org-mode . pix/org-mode-setup)
+    :config
+    (setq org-ellipsis " ▾"
+          org-hide-emphasis-markers t))
+
+  (font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-]\\) "
+                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "❃"))))))
 #+end_src
 ** Setting Org Mode Directory
 #+begin_src emacs-lisp
-(setq org-directory '$HOME/Desktop/org_mode/)
+(setq org-directory '~/Desktop/org_mode/)
 #+end_src
 ** Enabling Table of Contents
 #+begin_src emacs-lisp
@@ -405,9 +426,11 @@ Making GNU Emacs look a little nicer
 #+end_src
 ** Enabling Org Mode Bullets
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook 'org-indent-mode)
-(use-package org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("✿" "⛿" "⛾" "⚘" "⅌" "☫" "❦" "❀" "♨" "☃" "⚛" "☢" "☣" "☠" "㊙" "㊗" "🌚")))
 #+end_src
 * WHICH-KEY
 #+begin_src emacs-lisp
