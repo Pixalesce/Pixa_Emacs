@@ -17,15 +17,13 @@
   - [[#lsp-initialisation][LSP Initialisation]]
   - [[#keybindings][Keybindings]]
   - [[#syntax-highlighting-treesitter][Syntax Highlighting (TreeSitter)]]
-- [[#fonts][FONTS]]
 - [[#projectile][Projectile]]
 - [[#github-integration][Github Integration]]
   - [[#magit][Magit]]
   - [[#forge][Forge]]
 - [[#gui-tweaks][GUI Tweaks]]
-  - [[#setting-theme][Setting Theme]]
-  - [[#set-theme-colours][Set Theme Colours]]
   - [[#load-theme][Load Theme]]
+  - [[#fonts][FONTS]]
   - [[#mode-line][Mode Line]]
   - [[#disabling-start-up-message-add-warning][Disabling Start Up Message Add Warning]]
   - [[#disabling-menu-bar-tool-bars-and-scroll-bar][Disabling Menu Bar, Tool Bars and Scroll Bar]]
@@ -33,7 +31,9 @@
   - [[#highlight-current-line-disable-cursor-blink][Highlight Current Line, Disable Cursor Blink]]
 - [[#org-mode][ORG MODE]]
   - [[#basic-setup][Basic Setup]]
-  - [[#setting-org-mode-directory][Setting Org Mode Directory]]
+  - [[#org-font][Org Font]]
+  - [[#setting-org-directories][Setting Org Directories]]
+  - [[#org-agenda][Org Agenda]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
 - [[#which-key][WHICH-KEY]]
@@ -233,42 +233,6 @@
   (global-tree-sitter-mode)
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 #+end_src
-* FONTS
-Defining fonts that Emacs will use
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil
-    :font "Victor Mono"
-    :height 160
-    :weight 'medium)
-  (set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
-    :font "Helvetica"
-    :height 180
-    :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil
-    :font "Victor Mono"
-    :height 160
-    :weight 'medium)
-
-  ;; Makes commented text and keywords italics.
-  (set-face-attribute 'font-lock-comment-face nil
-    :slant 'italic :weight 'light)
-  (set-face-attribute 'font-lock-keyword-face nil
-    :slant 'italic)
-  (set-face-attribute 'font-lock-function-name-face nil
-    :slant 'italic)
-  (set-face-attribute 'font-lock-variable-name-face nil
-    :slant 'italic)
-
-  ;; This sets the default font on all graphical frames created after restarting Emacs.
-  ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
-  ;; are not right unless I also add this method of setting the default font.
-  (add-to-list 'default-frame-alist '(font . "Victor Mono-16"))
-
-  (setq-default line-spacing 0.12)
-#+end_src
-
-#+RESULTS:
-: 0.12
 * Projectile
 Better project library management
 #+begin_src emacs-lisp
@@ -306,40 +270,45 @@ Better project library management
   (use-package forge)
 #+end_src
 * GUI Tweaks
-Making GNU Emacs look a little nicer
-** Setting Theme
-#+begin_src emacs-lisp
-  (setq modus-themes-mode-line '(borderless) ;mode line
-        modus-themes-region '(bg-only) ;highlighting
-        modus-themes-completions '(moderate)) ;autocompletions
-
-  (setq modus-themes-bold-constructs t ;bold function names
-        modus-themes-italic-constructs t ;bold comments and stuff
-        modus-themes-paren-match '(bold intense) ;highlights parentheses
-        modus-themes-syntax '(alt-syntax green-strings yellow-comments) ;syntax style
-        modus-themes-fringes 'subtle
-        modus-themes-accented t
-        modus-themes-prompts '(bold intense))
-
-  (setq modus-themes-headings
-       '((1 . (rainbow 1.2))
-         (2 . (rainbow 1.175))
-         (3 . (rainbow 1.15))
-         (4 . (rainbow 1.125))
-         (5 . (rainbow 1.1))
-         (t . (rainbow semilight 1.05))) ;Headings settings
-       modus-themes-scale-headings t) ;Turn on headings scale
-
-  (setq modus-themes-org-blocks 'tinted-background) ;;highlight source blocks
-#+end_src
-** Set Theme Colours
-#+begin_src emacs-lisp
-  
-#+end_src
-
+Making GNU Emacs look nicer
 ** Load Theme
 #+begin_src emacs-lisp
- (load-theme 'modus-vivendi t)
+  (setq doom-themes-enable-bold t   
+      doom-themes-enable-italic t)
+  (load-theme 'doom-Iosvkem t)
+#+end_src
+** FONTS
+Defining fonts that Emacs will use
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+    :font "Victor Mono"
+    :height 160
+    :weight 'medium)
+  (set-face-attribute 'variable-pitch nil ;;non-monospaced fonts
+    :font "Helvetica"
+    :height 180
+    :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil
+    :font "Victor Mono"
+    :height 160
+    :weight 'medium)
+
+  ;; Makes commented text and keywords italics.
+  (set-face-attribute 'font-lock-comment-face nil
+    :slant 'italic :weight 'light)
+  (set-face-attribute 'font-lock-keyword-face nil
+    :slant 'italic)
+  (set-face-attribute 'font-lock-function-name-face nil
+    :slant 'italic :weight 'bold)
+  (set-face-attribute 'font-lock-variable-name-face nil
+    :slant 'italic)
+
+  ;; This sets the default font on all graphical frames created after restarting Emacs.
+  ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
+  ;; are not right unless I also add this method of setting the default font.
+  (add-to-list 'default-frame-alist '(font . "Victor Mono-16"))
+
+  (setq-default line-spacing 0.12)
 #+end_src
 ** Mode Line
 #+begin_src emacs-lisp
@@ -409,14 +378,53 @@ Making GNU Emacs look a little nicer
     :config
     (setq org-ellipsis " ▾"
           org-hide-emphasis-markers t))
-
-  (font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "❃"))))))
 #+end_src
-** Setting Org Mode Directory
+** Org Font
 #+begin_src emacs-lisp
-(setq org-directory '~/Desktop/org_mode/)
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "❃"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.175)
+                  (org-level-3 . 1.15)
+                  (org-level-4 . 1.125)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.075)
+                  (org-level-7 . 1.05)
+                  (org-level-8 . 1.025)))
+    (set-face-attribute (car face) nil :font "Victor Mono" :weight 'medium :height (cdr face)))
+  
+    (set-face-attribute 'org-document-title nil :font "Victor Mono" :weight 'bold :height 240 :underline t) 
+    (set-face-attribute 'org-document-info nil :font "Victor Mono" :weight 'medium :height 220) 
+    (set-face-attribute 'org-document-info-keyword nil :font "Victor Mono" :weight 'semibold :height 180) 
+    (set-face-attribute 'org-link nil :font "Victor Mono" :weight 'light) 
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+#+end_src
+** Setting Org Directories
+#+begin_src emacs-lisp
+  (setq org-directory '~/Desktop/org_mode/)
+#+end_src
+** Org Agenda
+#+begin_src emacs-lisp
+  (setq org-agenda-start-with-log-mode t
+        org-log-done 'time
+        org-log-into-drawer t)
+
+  (setq org-agenda-files
+    '("~/Desktop/org_mode/agenda/sample_tasks.org"))
+#+end_src
+*** Custom Agenda Views
+#+begin_src emacs-lisp
 #+end_src
 ** Enabling Table of Contents
 #+begin_src emacs-lisp
