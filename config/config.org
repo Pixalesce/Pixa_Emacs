@@ -389,6 +389,10 @@ Making GNU Emacs look a little nicer
   (blink-cursor-mode -1)
 #+end_src
 * ORG MODE
+#+begin_src emacs-lisp
+  (use-package evil-org)
+  (evil-org-mode 1)
+#+end_src
 ** Setting Org Mode Directory
 #+begin_src emacs-lisp
 (setq org-directory '$HOME/Desktop/org_mode/)
