@@ -3,7 +3,7 @@
 Welcome to my personal Emacs configuration. Feel free to make a copy of my files to configure your own experience of emacs :)
 
 ** Notes
-As ``user-emacs-directory`` differs by computer and operating system, do note that the location of your ``init.el`` might be placed in a different location. For me, ``user-emacs-directory`` is defaulted to ``.emacs.d``, so that's where my init file goes.
+As user-emacs-directory differs by computer and operating system, do note that the location of your init.el might be placed in a different location. For me, user-emacs-directory is defaulted to .emacs.d, so that's where my init file goes.
 
 *Org Mode setup*, including but not limited to org agenda and org capture template configurations, will be completed at a later date as it is not my current priority. I will probably look into more given time and greater familiarisation with Emacs.
 
