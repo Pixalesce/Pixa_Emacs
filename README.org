@@ -14,15 +14,16 @@ The configuration will load up automatically on the initial load of Emacs, and t
 │   └── config.org
 └── init.el
 #+end_src
-** TODO Features
-- [X] Package Manager
-- [X] Completion Support
-- [X] Evil Mode
-- [X] Fonts
-- [X] Project Management
-- [X] Github Integration
-- [ ] Org Mode Setup
-- [ ] LSP
-- [ ] File Management
-- [ ] Dashboard
-- [ ] Quality of Life
+** Completed Features
+-  Package Manager
+-  Completion Support
+-  Evil Mode
+-  Fonts
+-  Project Management
+-  Github Integration
+** Ongoing Additions
+-  Org Mode Setup
+-  LSP
+-  File Management
+-  Dashboard
+-  Quality of Life
