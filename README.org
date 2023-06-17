@@ -1,7 +1,5 @@
-#+title: Emacs From Scratch Configuration
+#+title: Pixa Emacs
 #+PROPERTY: header-args:emacs-lisp
-
-* Pixa_Emacs
 Welcome to my personal Emacs configuration. Feel free to make a copy of my files to configure your own experience of emacs :)
 
 ** Notes
