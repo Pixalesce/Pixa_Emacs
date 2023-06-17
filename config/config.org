@@ -301,6 +301,7 @@ Better project library management
   (epa-file-enable)
   (setq epa-pinentry-mode 'loopback)
 
+  (use-package sqlite3)
   (use-package forge)
 #+end_src
 * GUI Tweaks
