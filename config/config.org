@@ -6,6 +6,7 @@
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
 #+STARTUP: showeverything #unfolds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
+#+PROPERTY: header-args:emacs-lisp :tangle ../init.el
 
 * TABLE OF CONTENTS :toc:
 - [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
@@ -34,8 +35,10 @@
   - [[#org-font][Org Font]]
   - [[#setting-org-directories][Setting Org Directories]]
   - [[#org-agenda][Org Agenda]]
+  - [[#org-babel][Org Babel]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
+- [[#file-directory][FILE DIRECTORY]]
 - [[#which-key][WHICH-KEY]]
 - [[#quality-of-life][QUALITY OF LIFE]]
   - [[#minibuffer-prompt-history][Minibuffer Prompt History]]
@@ -268,6 +271,18 @@ Better project library management
 
   (use-package sqlite3)
   (use-package forge)
+
+  (pix/leader-keys
+    "C-f" '(:ignore t :wk "forge operations")
+    "C-f m" '(forge-merge :wk "merge current pull request")
+    "C-f f" '(forge-fork :wk "fork current repo and add it as remote")
+    "C-f l" '(:ignore t :wk "forge list operations")
+    "C-f lp" '(forge-list-pullreqs :wk "list pull requests")
+    "C-f li" '(forge-list-issues :wk "list issues")
+    "C-f ln" '(forge-list-notifications :wk "list notifications")
+    "C-f c" '(:ignore t :wk "forge create operations")
+    "C-f ci" '(forge-list-issues :wk "list issues")
+    "C-f ci" '(forge-list-pullreqs :wk "list pull requests"))
 #+end_src
 * GUI Tweaks
 Making GNU Emacs look nicer
@@ -381,10 +396,16 @@ Defining fonts that Emacs will use
 #+end_src
 ** Org Font
 #+begin_src emacs-lisp
-  ;; Replace list hyphen with dot
+  ;; Replace unordered lists with icons
   (font-lock-add-keywords 'org-mode
                           '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "❃"))))))
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "☭"))))))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([+]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "⚒"))))))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([*]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "✿"))))))
 
   ;; Set faces for heading levels
   (dolist (face '((org-level-1 . 1.2)
@@ -396,7 +417,7 @@ Defining fonts that Emacs will use
                   (org-level-7 . 1.05)
                   (org-level-8 . 1.025)))
     (set-face-attribute (car face) nil :font "Victor Mono" :weight 'medium :height (cdr face)))
-  
+
     (set-face-attribute 'org-document-title nil :font "Victor Mono" :weight 'bold :height 240 :underline t) 
     (set-face-attribute 'org-document-info nil :font "Victor Mono" :weight 'medium :height 220) 
     (set-face-attribute 'org-document-info-keyword nil :font "Victor Mono" :weight 'semibold :height 180) 
@@ -426,6 +447,21 @@ Defining fonts that Emacs will use
 *** Custom Agenda Views
 #+begin_src emacs-lisp
 #+end_src
+** Org Babel
+check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][supported org babel languages]]
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . t)
+      (python . t)))
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
 ** Enabling Table of Contents
 #+begin_src emacs-lisp
 (use-package toc-org
@@ -439,6 +475,26 @@ Defining fonts that Emacs will use
     :hook (org-mode . org-bullets-mode)
     :custom
     (org-bullets-bullet-list '("✿" "⛿" "⛾" "⚘" "⅌" "☫" "❦" "❀" "♨" "☃" "⚛" "☢" "☣" "☠" "㊙" "㊗" "🌚")))
+#+end_src
+* FILE DIRECTORY
+#+begin_src emacs-lisp
+  (use-package dired-sidebar
+    :ensure t
+    :custom
+    (dired-sidebar-width 27)
+    (dired-sidebar-window-fixed 'width)
+    (dired-sidebar-use-magit-integration t)
+    :bind
+         ("C-h" . dired-sidebar-up-directory)
+         ("C-l" . dired-sidebar-find-file)
+    :commands (dired-sidebar-toggle-sidebar))
+
+  (pix/leader-keys
+    "f" '(:ignore t :wk "file directory operators")
+    "fd" '(dired-sidebar-toggle-with-current-directory :wk "dired sidebar toggle"))
+  (pix/ctrl-c-keys
+    "f" '(:ignore t :wk "file directory operators")
+    "fd" '(dired-sidebar-toggle-with-current-directory :wk "dired sidebar toggle"))
 #+end_src
 * WHICH-KEY
 #+begin_src emacs-lisp
@@ -511,32 +567,45 @@ Defining fonts that Emacs will use
 #+end_src
 ** Window Toggle
 #+begin_src emacs-lisp
-  (defun toggle-window-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-         (next-win-buffer (window-buffer (next-window)))
-         (this-win-edges (window-edges (selected-window)))
-         (next-win-edges (window-edges (next-window)))
-         (this-win-2nd (not (and (<= (car this-win-edges)
-                     (car next-win-edges))
-                     (<= (cadr this-win-edges)
-                     (cadr next-win-edges)))))
-         (splitter
-          (if (= (car this-win-edges)
-             (car (window-edges (next-window))))
-          'split-window-horizontally
-        'split-window-vertically)))
-    (delete-other-windows)
-    (let ((first-win (selected-window)))
-      (funcall splitter)
-      (if this-win-2nd (other-window 1))
-      (set-window-buffer (selected-window) this-win-buffer)
-      (set-window-buffer (next-window) next-win-buffer)
-      (select-window first-win)
-      (if this-win-2nd (other-window 1))))))
+   (defun toggle-window-split ()
+   (interactive)
+   (if (= (count-windows) 2)
+       (let* ((this-win-buffer (window-buffer))
+          (next-win-buffer (window-buffer (next-window)))
+          (this-win-edges (window-edges (selected-window)))
+          (next-win-edges (window-edges (next-window)))
+          (this-win-2nd (not (and (<= (car this-win-edges)
+                      (car next-win-edges))
+                      (<= (cadr this-win-edges)
+                      (cadr next-win-edges)))))
+          (splitter
+           (if (= (car this-win-edges)
+              (car (window-edges (next-window))))
+           'split-window-horizontally
+         'split-window-vertically)))
+     (delete-other-windows)
+     (let ((first-win (selected-window)))
+       (funcall splitter)
+       (if this-win-2nd (other-window 1))
+       (set-window-buffer (selected-window) this-win-buffer)
+       (set-window-buffer (next-window) next-win-buffer)
+       (select-window first-win)
+       (if this-win-2nd (other-window 1))))))
 
   (pix/ctrl-c-keys
     "w" '(:ignore t :wk "window operators")
     "ww" '(toggle-window-split :wk "toggle window split"))
+
+  (pix/leader-keys
+     "w" '(:ignore t :wk "window operators")
+     "ws" '(evil-window-split :wk "evil window split")
+     "wv" '(evil-window-vsplit :wk "evil window vsplit")
+     "wh" '(evil-window-left :wk "evil window left")
+     "wk" '(evil-window-up :wk "evil window up")
+     "wj" '(evil-window-down :wk "evil window down")
+     "wl" '(evil-window-right :wk "evil window right")
+     "wc" '(evil-window-delete :wk "evil window delete")
+     "wr" '(evil-window-rotate-downwards :wk "evil window rotate downwards")
+     "wR" '(evil-window-rotate-upwards :wk "evil window rotate upwards")
+     "ww" '(toggle-window-split :wk "toggle window split"))
 #+end_src
