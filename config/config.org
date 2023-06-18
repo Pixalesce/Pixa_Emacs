@@ -2,7 +2,7 @@
 #+AUTHOR: Pixalesce
 #+Maintainer: Pixalesce <pixalesce@gmail.com>
 #+Created: June 10, 2023
-#+Modified: June 17, 2023
+#+Modified: June 19, 2023
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
 #+STARTUP: showeverything #unfolds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
@@ -38,7 +38,6 @@
   - [[#org-babel][Org Babel]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
-- [[#file-directory][FILE DIRECTORY]]
 - [[#which-key][WHICH-KEY]]
 - [[#quality-of-life][QUALITY OF LIFE]]
   - [[#minibuffer-prompt-history][Minibuffer Prompt History]]
@@ -55,8 +54,8 @@
 
 * TOP LEVEL PROGRAMS TO LOAD
 #+begin_src emacs-lisp
-(add-to-list 'image-types 'svg)
-(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; maximises window frame
+  (add-to-list 'image-types 'svg)
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; maximises window frame
 #+end_src
 ** Set Custom Variables Save Path
 #+begin_src emacs-lisp
@@ -179,24 +178,95 @@
 #+end_src
 ** LSP Initialisation
 *** Base set up
+Booting up LSP mode
 #+begin_src emacs-lisp
-
+  (defun pix/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode))
+  
+  (use-package lsp-mode
+    :commands (lsp lsp-deffered)
+    :hook (lsp-mode . pix/lsp-mode-setup)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :config
+    (lsp-enable-which-key-integration t))
+#+end_src
+*** Completion Setup
+#+begin_src emacs-lisp
+  (use-package company
+    :after lsp-mode
+    :hook (lsp-mode . company-mode)
+    :bind (:map company-active-map
+           ("C-l" . company-complete-selection)
+           ("C-h" . company-select-previous)
+           ("C-k" . company-select-next))
+          (:map lsp-mode-map
+           ("<tab>" . company-indent-or-complete-common))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
+  (lsp-inlay-hints-mode)
+  (setq lsp-inlay-hint-enable t)
 #+end_src
 *** LSP-UI
 #+begin_src emacs-lisp
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
 
+  (use-package lsp-ui
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-peek-always-show t)
+    ;; (lsp-ui-sideline-show-hover t)
+    (setq lsp-ui-doc-position 'bottom))
 #+end_src
 *** LSP-treemacs
 #+begin_src emacs-lisp
-
+  (use-package lsp-treemacs
+    :after lsp)
 #+end_src
-*** LSP-ivy
+*** Flycheck
 #+begin_src emacs-lisp
-
+ (use-package flycheck :ensure)
 #+end_src
-*** Rust Mode
+*** Rust
 #+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure
+    :commands lsp
+    :custom
+    ;; what to use when checking on-save. "check" is default, I prefer clippy
+    (lsp-rust-analyzer-cargo-watch-command "clippy")
+    (lsp-eldoc-render-all t)
+    (lsp-idle-delay 0.0)
+    ;; enable / disable the hints as you prefer:
+    (lsp-rust-analyzer-server-display-inlay-hints t)
+    (lsp-rust-analyzer-display-lifetime-elision-hints-enable   "skip_trivial")
+    (lsp-rust-analyzer-display-chaining-hints t)
+    (lsp-rust-analyzer-binding-mode-hints t)
+    (lsp-rust-analyzer-closing-brace-hints-min-lines 0)
+    (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+    (lsp-rust-analyzer-display-closure-return-type-hints t)
+    (lsp-rust-analyzer-display-parameter-hints t)
+    (lsp-rust-analyzer-server-format-inlay-hints t)
+    (lsp-rust-analyzer-display-reborrow-hints nil)
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
+  (use-package rustic
+      :mode "\\.rs\\'"
+      :hook (rustic-mode . lsp-deferred))
+#+end_src
+*** Python
+#+begin_src emacs-lisp
+  (use-package lsp-pyright
+    :ensure t
+    :hook (python-mode . (lambda ()
+                           (require 'lsp-pyright)
+                           (lsp-deferred))))
+  (setq lsp-pyright-use-library-code-for-types t) ;; set this to nil if getting too many false positive type errors
+  (setq lsp-pyright-stub-path (concat (getenv "HOME") "/.pyright_lsp/python-type-stubs"))
 #+end_src
 ** Keybindings
 *** General
@@ -290,7 +360,7 @@ Making GNU Emacs look nicer
 #+begin_src emacs-lisp
   (setq doom-themes-enable-bold t   
       doom-themes-enable-italic t)
-  (load-theme 'doom-Iosvkem t)
+  (load-theme 'doom-tokyo-night t)
 #+end_src
 ** FONTS
 Defining fonts that Emacs will use
@@ -475,26 +545,6 @@ check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][support
     :hook (org-mode . org-bullets-mode)
     :custom
     (org-bullets-bullet-list '("✿" "⛿" "⛾" "⚘" "⅌" "☫" "❦" "❀" "♨" "☃" "⚛" "☢" "☣" "☠" "㊙" "㊗" "🌚")))
-#+end_src
-* FILE DIRECTORY
-#+begin_src emacs-lisp
-  (use-package dired-sidebar
-    :ensure t
-    :custom
-    (dired-sidebar-width 27)
-    (dired-sidebar-window-fixed 'width)
-    (dired-sidebar-use-magit-integration t)
-    :bind
-         ("C-h" . dired-sidebar-up-directory)
-         ("C-l" . dired-sidebar-find-file)
-    :commands (dired-sidebar-toggle-sidebar))
-
-  (pix/leader-keys
-    "f" '(:ignore t :wk "file directory operators")
-    "fd" '(dired-sidebar-toggle-with-current-directory :wk "dired sidebar toggle"))
-  (pix/ctrl-c-keys
-    "f" '(:ignore t :wk "file directory operators")
-    "fd" '(dired-sidebar-toggle-with-current-directory :wk "dired sidebar toggle"))
 #+end_src
 * WHICH-KEY
 #+begin_src emacs-lisp
