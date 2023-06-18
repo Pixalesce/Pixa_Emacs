@@ -12,6 +12,9 @@ history
 places
 recentf
 
+.cache
+.lsp-session-v1
+
 forge-database.sqlite
 projectile-bookmarks.eld
 *.*~

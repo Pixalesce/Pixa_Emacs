@@ -1,5 +1,5 @@
 #+title: Pixa Emacs
-#+DATE: 2023-06-18
+#+DATE: 2023-06-19
 #+DESCRIPTION: Personal Emacs configuration of Pixalesce
 #+AUTHOR: Pixalesce
 #+EMAIL: pixalesce@gmail.com
@@ -25,11 +25,13 @@ The configuration will load up automatically on the initial load of Emacs, and t
 - Evil Mode
 - Fonts
 - Project Management
-- Github Integration
-** Ongoing Additions
-- LSP
 - File Management
+- Github Integration
+- LSP (Python, Rust)
+** Ongoing Additions
+- LSP (Java, JavaScript, HTML, CSS)
 - Dashboard
 - Notion Integration
+- Email Integration
 - Org Mode Setup
 - Quality of Life

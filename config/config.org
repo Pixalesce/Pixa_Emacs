@@ -2,10 +2,11 @@
 #+AUTHOR: Pixalesce
 #+Maintainer: Pixalesce <pixalesce@gmail.com>
 #+Created: June 10, 2023
-#+Modified: June 17, 2023
+#+Modified: June 19, 2023
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
 #+STARTUP: showeverything #unfolds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
+#+PROPERTY: header-args:emacs-lisp :tangle ../init.el
 
 * TABLE OF CONTENTS :toc:
 - [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
@@ -34,6 +35,7 @@
   - [[#org-font][Org Font]]
   - [[#setting-org-directories][Setting Org Directories]]
   - [[#org-agenda][Org Agenda]]
+  - [[#org-babel][Org Babel]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
 - [[#which-key][WHICH-KEY]]
@@ -52,8 +54,8 @@
 
 * TOP LEVEL PROGRAMS TO LOAD
 #+begin_src emacs-lisp
-(add-to-list 'image-types 'svg)
-(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; maximises window frame
+  (add-to-list 'image-types 'svg)
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; maximises window frame
 #+end_src
 ** Set Custom Variables Save Path
 #+begin_src emacs-lisp
@@ -176,24 +178,95 @@
 #+end_src
 ** LSP Initialisation
 *** Base set up
+Booting up LSP mode
 #+begin_src emacs-lisp
-
+  (defun pix/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode))
+  
+  (use-package lsp-mode
+    :commands (lsp lsp-deffered)
+    :hook (lsp-mode . pix/lsp-mode-setup)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :config
+    (lsp-enable-which-key-integration t))
+#+end_src
+*** Completion Setup
+#+begin_src emacs-lisp
+  (use-package company
+    :after lsp-mode
+    :hook (lsp-mode . company-mode)
+    :bind (:map company-active-map
+           ("C-l" . company-complete-selection)
+           ("C-h" . company-select-previous)
+           ("C-k" . company-select-next))
+          (:map lsp-mode-map
+           ("<tab>" . company-indent-or-complete-common))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
+  (lsp-inlay-hints-mode)
+  (setq lsp-inlay-hint-enable t)
 #+end_src
 *** LSP-UI
 #+begin_src emacs-lisp
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
 
+  (use-package lsp-ui
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-peek-always-show t)
+    ;; (lsp-ui-sideline-show-hover t)
+    (setq lsp-ui-doc-position 'bottom))
 #+end_src
 *** LSP-treemacs
 #+begin_src emacs-lisp
-
+  (use-package lsp-treemacs
+    :after lsp)
 #+end_src
-*** LSP-ivy
+*** Flycheck
 #+begin_src emacs-lisp
-
+ (use-package flycheck :ensure)
 #+end_src
-*** Rust Mode
+*** Rust
 #+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure
+    :commands lsp
+    :custom
+    ;; what to use when checking on-save. "check" is default, I prefer clippy
+    (lsp-rust-analyzer-cargo-watch-command "clippy")
+    (lsp-eldoc-render-all t)
+    (lsp-idle-delay 0.0)
+    ;; enable / disable the hints as you prefer:
+    (lsp-rust-analyzer-server-display-inlay-hints t)
+    (lsp-rust-analyzer-display-lifetime-elision-hints-enable   "skip_trivial")
+    (lsp-rust-analyzer-display-chaining-hints t)
+    (lsp-rust-analyzer-binding-mode-hints t)
+    (lsp-rust-analyzer-closing-brace-hints-min-lines 0)
+    (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+    (lsp-rust-analyzer-display-closure-return-type-hints t)
+    (lsp-rust-analyzer-display-parameter-hints t)
+    (lsp-rust-analyzer-server-format-inlay-hints t)
+    (lsp-rust-analyzer-display-reborrow-hints nil)
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
+  (use-package rustic
+      :mode "\\.rs\\'"
+      :hook (rustic-mode . lsp-deferred))
+#+end_src
+*** Python
+#+begin_src emacs-lisp
+  (use-package lsp-pyright
+    :ensure t
+    :hook (python-mode . (lambda ()
+                           (require 'lsp-pyright)
+                           (lsp-deferred))))
+  (setq lsp-pyright-use-library-code-for-types t) ;; set this to nil if getting too many false positive type errors
+  (setq lsp-pyright-stub-path (concat (getenv "HOME") "/.pyright_lsp/python-type-stubs"))
 #+end_src
 ** Keybindings
 *** General
@@ -268,6 +341,18 @@ Better project library management
 
   (use-package sqlite3)
   (use-package forge)
+
+  (pix/leader-keys
+    "C-f" '(:ignore t :wk "forge operations")
+    "C-f m" '(forge-merge :wk "merge current pull request")
+    "C-f f" '(forge-fork :wk "fork current repo and add it as remote")
+    "C-f l" '(:ignore t :wk "forge list operations")
+    "C-f lp" '(forge-list-pullreqs :wk "list pull requests")
+    "C-f li" '(forge-list-issues :wk "list issues")
+    "C-f ln" '(forge-list-notifications :wk "list notifications")
+    "C-f c" '(:ignore t :wk "forge create operations")
+    "C-f ci" '(forge-create-issues :wk "create issues")
+    "C-f cp" '(forge-create-pullreq :wk "create pull request"))
 #+end_src
 * GUI Tweaks
 Making GNU Emacs look nicer
@@ -275,7 +360,7 @@ Making GNU Emacs look nicer
 #+begin_src emacs-lisp
   (setq doom-themes-enable-bold t   
       doom-themes-enable-italic t)
-  (load-theme 'doom-Iosvkem t)
+  (load-theme 'doom-tokyo-night t)
 #+end_src
 ** FONTS
 Defining fonts that Emacs will use
@@ -381,10 +466,16 @@ Defining fonts that Emacs will use
 #+end_src
 ** Org Font
 #+begin_src emacs-lisp
-  ;; Replace list hyphen with dot
+  ;; Replace unordered lists with icons
   (font-lock-add-keywords 'org-mode
                           '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "❃"))))))
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "☭"))))))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([+]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "⚒"))))))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([*]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "✿"))))))
 
   ;; Set faces for heading levels
   (dolist (face '((org-level-1 . 1.2)
@@ -396,7 +487,7 @@ Defining fonts that Emacs will use
                   (org-level-7 . 1.05)
                   (org-level-8 . 1.025)))
     (set-face-attribute (car face) nil :font "Victor Mono" :weight 'medium :height (cdr face)))
-  
+
     (set-face-attribute 'org-document-title nil :font "Victor Mono" :weight 'bold :height 240 :underline t) 
     (set-face-attribute 'org-document-info nil :font "Victor Mono" :weight 'medium :height 220) 
     (set-face-attribute 'org-document-info-keyword nil :font "Victor Mono" :weight 'semibold :height 180) 
@@ -425,6 +516,21 @@ Defining fonts that Emacs will use
 #+end_src
 *** Custom Agenda Views
 #+begin_src emacs-lisp
+#+end_src
+** Org Babel
+check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][supported org babel languages]]
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . t)
+      (python . t)))
+  (setq org-confirm-babel-evaluate nil)
 #+end_src
 ** Enabling Table of Contents
 #+begin_src emacs-lisp
@@ -511,32 +617,45 @@ Defining fonts that Emacs will use
 #+end_src
 ** Window Toggle
 #+begin_src emacs-lisp
-  (defun toggle-window-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-         (next-win-buffer (window-buffer (next-window)))
-         (this-win-edges (window-edges (selected-window)))
-         (next-win-edges (window-edges (next-window)))
-         (this-win-2nd (not (and (<= (car this-win-edges)
-                     (car next-win-edges))
-                     (<= (cadr this-win-edges)
-                     (cadr next-win-edges)))))
-         (splitter
-          (if (= (car this-win-edges)
-             (car (window-edges (next-window))))
-          'split-window-horizontally
-        'split-window-vertically)))
-    (delete-other-windows)
-    (let ((first-win (selected-window)))
-      (funcall splitter)
-      (if this-win-2nd (other-window 1))
-      (set-window-buffer (selected-window) this-win-buffer)
-      (set-window-buffer (next-window) next-win-buffer)
-      (select-window first-win)
-      (if this-win-2nd (other-window 1))))))
+   (defun toggle-window-split ()
+   (interactive)
+   (if (= (count-windows) 2)
+       (let* ((this-win-buffer (window-buffer))
+          (next-win-buffer (window-buffer (next-window)))
+          (this-win-edges (window-edges (selected-window)))
+          (next-win-edges (window-edges (next-window)))
+          (this-win-2nd (not (and (<= (car this-win-edges)
+                      (car next-win-edges))
+                      (<= (cadr this-win-edges)
+                      (cadr next-win-edges)))))
+          (splitter
+           (if (= (car this-win-edges)
+              (car (window-edges (next-window))))
+           'split-window-horizontally
+         'split-window-vertically)))
+     (delete-other-windows)
+     (let ((first-win (selected-window)))
+       (funcall splitter)
+       (if this-win-2nd (other-window 1))
+       (set-window-buffer (selected-window) this-win-buffer)
+       (set-window-buffer (next-window) next-win-buffer)
+       (select-window first-win)
+       (if this-win-2nd (other-window 1))))))
 
   (pix/ctrl-c-keys
     "w" '(:ignore t :wk "window operators")
     "ww" '(toggle-window-split :wk "toggle window split"))
+
+  (pix/leader-keys
+     "w" '(:ignore t :wk "window operators")
+     "ws" '(evil-window-split :wk "evil window split")
+     "wv" '(evil-window-vsplit :wk "evil window vsplit")
+     "wh" '(evil-window-left :wk "evil window left")
+     "wk" '(evil-window-up :wk "evil window up")
+     "wj" '(evil-window-down :wk "evil window down")
+     "wl" '(evil-window-right :wk "evil window right")
+     "wc" '(evil-window-delete :wk "evil window delete")
+     "wr" '(evil-window-rotate-downwards :wk "evil window rotate downwards")
+     "wR" '(evil-window-rotate-upwards :wk "evil window rotate upwards")
+     "ww" '(toggle-window-split :wk "toggle window split"))
 #+end_src
