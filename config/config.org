@@ -351,8 +351,8 @@ Better project library management
     "C-f li" '(forge-list-issues :wk "list issues")
     "C-f ln" '(forge-list-notifications :wk "list notifications")
     "C-f c" '(:ignore t :wk "forge create operations")
-    "C-f ci" '(forge-list-issues :wk "list issues")
-    "C-f ci" '(forge-list-pullreqs :wk "list pull requests"))
+    "C-f ci" '(forge-create-issues :wk "create issues")
+    "C-f cp" '(forge-create-pullreq :wk "create pull request"))
 #+end_src
 * GUI Tweaks
 Making GNU Emacs look nicer
