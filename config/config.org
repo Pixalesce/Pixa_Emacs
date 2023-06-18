@@ -6,7 +6,7 @@
 #+DESCRIPTION: The personal Emacs configuration of Pixalesce
 #+STARTUP: showeverything #unfolds the entire document on startup
 #+OPTIONS: toc:2 #Limits table of contents header levels to 2 deep
-#+PROPERTY: header-args:emacs-lisp :tangle ../init.el
+#+PROPERTY: header-args:emacs-lisp 
 
 * TABLE OF CONTENTS :toc:
 - [[#top-level-programs-to-load][TOP LEVEL PROGRAMS TO LOAD]]
@@ -206,7 +206,7 @@ Booting up LSP mode
     :custom
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0))
-  (lsp-inlay-hints-mode)
+  (setq lsp-inlay-hints-mode t)
   (setq lsp-inlay-hint-enable t)
 #+end_src
 *** LSP-UI
