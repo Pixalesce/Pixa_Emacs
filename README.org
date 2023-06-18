@@ -25,11 +25,12 @@ The configuration will load up automatically on the initial load of Emacs, and t
 - Evil Mode
 - Fonts
 - Project Management
+- File Management
 - Github Integration
 ** Ongoing Additions
 - LSP
-- File Management
 - Dashboard
 - Notion Integration
+- Email Integration
 - Org Mode Setup
 - Quality of Life
