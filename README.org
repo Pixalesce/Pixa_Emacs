@@ -1,5 +1,5 @@
 #+title: Pixa Emacs
-#+DATE: 2023-06-19
+#+DATE: 2023-06-18
 #+DESCRIPTION: Personal Emacs configuration of Pixalesce
 #+AUTHOR: Pixalesce
 #+EMAIL: pixalesce@gmail.com
@@ -7,6 +7,8 @@ Welcome to my personal Emacs configuration. Feel free to make a copy of my files
 
 ** Notes
 As =user-emacs-directory= differs by computer and operating system, do note that the location of your =init.el= might be placed in a different location. For me, =user-emacs-directory= is defaulted to =.emacs.d=, so that's where my init file goes.
+
+Setup of *LSP* is based on the languages that I most commonly use at the moment. Should I learn other languages, the necessary language servers will be set up as well.
 
 *Org Mode setup*, including but not limited to org agenda and org capture template configurations, will be completed at a later date as it is not my current priority. I will probably look into more given time and greater familiarisation with Emacs.
 
@@ -27,9 +29,15 @@ The configuration will load up automatically on the initial load of Emacs, and t
 - Project Management
 - File Management
 - Github Integration
-- LSP (Python, Rust)
+- LSP
+  + Python
+  + Rust, TOML
+  + Java
+  + C, C++
+  + JavaScript, TypeScript
+  + HTML, CSS
 ** Ongoing Additions
-- LSP (Java, JavaScript, HTML, CSS)
+- LSP
 - Dashboard
 - Notion Integration
 - Email Integration
