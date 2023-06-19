@@ -199,8 +199,8 @@ Booting up LSP mode
     :hook (lsp-mode . company-mode)
     :bind (:map company-active-map
            ("C-l" . company-complete-selection)
-           ("C-h" . company-select-previous)
-           ("C-k" . company-select-next))
+           ("C-k" . company-select-previous)
+           ("C-h" . company-select-next))
           (:map lsp-mode-map
            ("<tab>" . company-indent-or-complete-common))
     :custom
@@ -255,9 +255,13 @@ Booting up LSP mode
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
   (use-package rustic
-    :after lsp-mode
+    :after lsp
     :mode "\\.rs\\'"
     :hook (rustic-mode . lsp-deferred))
+#+end_src
+*** TOML
+#+begin_src emacs-lisp
+  (add-hook 'conf-toml-mode-hook #'lsp-deferred)
 #+end_src
 *** Python
 #+begin_src emacs-lisp
@@ -268,6 +272,42 @@ Booting up LSP mode
                            (lsp-deferred))))
   (setq lsp-pyright-use-library-code-for-types t) ;; set this to nil if getting too many false positive type errors
   (setq lsp-pyright-stub-path (concat (getenv "HOME") "/.pyright_lsp/python-type-stubs"))
+#+end_src
+*** Java
+#+begin_src emacs-lisp
+  (setenv "JAVA_HOME" "/Users/basil/.sdkman/candidates/java/current")
+  (setq lsp-java-java-path "/Users/basil/.sdkman/candidates/java/current/bin/java")
+  (setq lsp-java-jdt-download-url "https://www.eclipse.org/downloads/download.php?file=/jdtls/snapshots/jdt-language-server-latest.tar.gz")
+  (use-package lsp-java
+      :hook (java-mode . lsp-deferred)
+      :config
+      (setq java-indent-level 2))
+#+end_src
+*** JavaScript
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-hook 'mhtml-mode-hook #'lsp-deferred)
+#+end_src
+*** Typescript
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+#+end_src
+*** HTML
+#+begin_src emacs-lisp
+  (add-hook 'mhtml-mode-hook #'lsp-deferred)
+#+end_src
+*** CSS
+#+begin_src emacs-lisp
+  (add-hook 'css-mode-hook #'lsp-deferred)
+#+end_src
+*** C/C++
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-hook #'lsp-deferred)
+  (add-hook 'c++-mode-hook #'lsp-deferred)
 #+end_src
 ** Keybindings
 *** General
