@@ -233,7 +233,7 @@ Booting up LSP mode
 *** Rust
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :ensure
+    :ensure t
     :commands lsp
     :custom
     ;; what to use when checking on-save. "check" is default, I prefer clippy
@@ -255,8 +255,9 @@ Booting up LSP mode
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
   (use-package rustic
-      :mode "\\.rs\\'"
-      :hook (rustic-mode . lsp-deferred))
+    :after lsp-mode
+    :mode "\\.rs\\'"
+    :hook (rustic-mode . lsp-deferred))
 #+end_src
 *** Python
 #+begin_src emacs-lisp
