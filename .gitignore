@@ -8,19 +8,16 @@ transient
 elpa
 url
 
+logs
 history
-places
-recentf
 
 .cache
 .lsp-session-v1
 
 eclipse.jdt.ls
 workspace
-.dap-breakpoints
 
 forge-database.sqlite
-projectile-bookmarks.eld
 *.*~
 
 # Undo Tree Files
