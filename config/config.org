@@ -391,6 +391,8 @@ Better project library management
   (epa-file-enable)
   (setq epa-pinentry-mode 'loopback)
 
+  (setq forge-database-file "~/.emacs.d/logs/forge-database.sqlite")
+ 
   (use-package sqlite3)
   (use-package forge)
 
@@ -405,8 +407,6 @@ Better project library management
     "C-f c" '(:ignore t :wk "forge create operations")
     "C-f ci" '(forge-create-issues :wk "create issues")
     "C-f cp" '(forge-create-pullreq :wk "create pull request"))
-
-  (setq forge-database-file "~/.emacs.d/logs/forge-database.sqlite")
 #+end_src
 * GUI Tweaks
 Making GNU Emacs look nicer
