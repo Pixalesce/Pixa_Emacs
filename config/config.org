@@ -390,8 +390,6 @@ Better project library management
   (custom-set-variables '(epg-gpg-program  "/usr/local/opt/gnupg@2.2/bin/gpg"))
   (epa-file-enable)
   (setq epa-pinentry-mode 'loopback)
-
-  (setq forge-database-file "~/.emacs.d/logs/forge-database.sqlite")
  
   (use-package sqlite3)
   (use-package forge)
@@ -644,7 +642,8 @@ check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][support
 #+end_src
 ** Restore Last Cursor Position
 #+begin_src emacs-lisp
-(save-place-mode 1)
+  (save-place-mode 1)
+  (setq save-place-file "~/.emacs.d/logs/places")
 #+end_src
 ** Disable UI Dialogs
 #+begin_src emacs-lisp
