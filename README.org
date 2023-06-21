@@ -3,6 +3,7 @@
 #+DESCRIPTION: Personal Emacs configuration of Pixalesce
 #+AUTHOR: Pixalesce
 #+EMAIL: pixalesce@gmail.com
+[[./etc/screenshot.jpeg]]
 Welcome to my personal Emacs configuration. Feel free to make a copy of my files to configure your own experience of emacs :)
 
 ** Notes
