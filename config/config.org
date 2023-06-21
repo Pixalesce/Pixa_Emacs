@@ -360,11 +360,13 @@ Better project library management
                              user-emacs-directory)
       projectile-known-projects-file (expand-file-name "./logs/projectile-bookmarks.eld"
                              user-emacs-directory))
-  
+  (setq projectile-require-project-root nil)
+
   (use-package projectile
     :diminish projectile-mode
     :config (projectile-mode)
-    :custom ((projectile-completion-system 'ivy))
+    :custom ((projectile-completion-system 'ivy)
+             (projectile-auto-discover nil))
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
@@ -504,8 +506,8 @@ Defining fonts that Emacs will use
     :init
     (progn
       (setq dashboard-items '((bookmarks . 3)
-                              (recents . 3)
-                              (projects . 5)
+                              (recents . 5)
+                              (projects . 3)
                               (agenda . 10)))
       (setq dashboard-show-shortcuts nil
             dashboard-center-content t
@@ -513,7 +515,7 @@ Defining fonts that Emacs will use
             dashboard-set-file-icons t
             dashboard-set-heading-icons t
             dashboard-set-init-info t
-            dashboard-startup-banner (expand-file-name "config/assets/Pixalesce.png" user-emacs-directory)
+            dashboard-startup-banner (expand-file-name "config/assets/Pixalesce_banner.png" user-emacs-directory)
             dashboard-item-names '(("Recent Files:" . "Recents:")
                                    ("Bookmarks:" . "Pinned:"))
             dashboard-footer-icon nil)
@@ -657,7 +659,6 @@ check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][support
 ** Recent Files
 #+begin_src emacs-lisp
   (recentf-mode 1)
-  (setq recentf-save-file "~/.emacs.d/logs/recentf")
 #+end_src
 ** Hydra
 #+begin_src emacs-lisp
