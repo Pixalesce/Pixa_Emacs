@@ -366,6 +366,7 @@ Better project library management
     :diminish projectile-mode
     :config (projectile-mode)
     :custom ((projectile-completion-system 'ivy)
+             (projectile-track-known-projects-automatically nil)
              (projectile-auto-discover nil))
     :bind-keymap
     ("C-c p" . projectile-command-map)
@@ -398,6 +399,7 @@ Better project library management
 
   (pix/leader-keys
     "C-f" '(:ignore t :wk "forge operations")
+    "C-f p" '(forge-pull :wk "pull from repo")
     "C-f m" '(forge-merge :wk "merge current pull request")
     "C-f f" '(forge-fork :wk "fork current repo and add it as remote")
     "C-f l" '(:ignore t :wk "forge list operations")
@@ -542,7 +544,7 @@ Defining fonts that Emacs will use
   (use-package org
     :hook (org-mode . pix/org-mode-setup)
     :config
-    (setq org-ellipsis " ▾"
+    (setq org-ellipsis " ↯"
           org-hide-emphasis-markers t))
 #+end_src
 ** Org Font
