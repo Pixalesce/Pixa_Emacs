@@ -36,9 +36,9 @@ The configuration will load up automatically on the initial load of Emacs, and t
   + C, C++
   + JavaScript, TypeScript
   + HTML, CSS
+- Dashboard
 ** Ongoing Additions
 - LSP
-- Dashboard
 - Notion Integration
 - Email Integration
 - Org Mode Setup

@@ -8,8 +8,8 @@ transient
 elpa
 url
 
+logs
 history
-places
 recentf
 
 .cache
@@ -17,10 +17,8 @@ recentf
 
 eclipse.jdt.ls
 workspace
-.dap-breakpoints
 
 forge-database.sqlite
-projectile-bookmarks.eld
 *.*~
 
 # Undo Tree Files
