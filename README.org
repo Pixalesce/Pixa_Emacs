@@ -38,7 +38,10 @@ The configuration will load up automatically on the initial load of Emacs, and t
   + JavaScript, TypeScript
   + HTML, CSS
 - Dashboard
+- vterm
+  
 ** Ongoing Additions
+Note: As Emacs has been configured to a minimal IDE build, ongoing configurations of other features will take a back seat as I refocus myself to my other [[https://github.com/Pixalesce?tab=repositories][projects]].
 - LSP
 - Notion Integration
 - Email Integration
