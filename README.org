@@ -3,22 +3,25 @@
 #+DESCRIPTION: Personal Emacs configuration of Pixalesce
 #+AUTHOR: Pixalesce
 #+EMAIL: pixalesce@gmail.com
-Welcome to my personal Emacs configuration. Feel free to make a copy of my files to configure your own experience of emacs :)
+[[./etc/screenshot.jpeg]]
+Welcome to my personal Emacs configuration. Feel free to make a copy of my files to configure your own experience of [[https://www.gnu.org/software/emacs/][Emacs]] :)
 
 ** Notes
 As =user-emacs-directory= differs by computer and operating system, do note that the location of your =init.el= might be placed in a different location. For me, =user-emacs-directory= is defaulted to =.emacs.d=, so that's where my init file goes.
 
-Setup of *LSP* is based on the languages that I most commonly use at the moment. Should I learn other languages, the necessary language servers will be set up as well.
+Setup of [[https://langserver.org/][LSP]] is based on the languages that I most commonly use at the moment. Should I learn other languages, the necessary language servers will be set up as well.
 
 *Org Mode setup*, including but not limited to org agenda and org capture template configurations, will be completed at a later date as it is not my current priority. I will probably look into more given time and greater familiarisation with Emacs.
 
-The configuration will load up automatically on the initial load of Emacs, and the configuration can be further personalised thereafter.
+The configuration will load up automatically on the initial load of Emacs, and it can be further personalised thereafter.
 
 *** Visualisation of My Directory Tree
 #+begin_src bash
 .emacs.d
 ├── config
-│   └── config.org
+│   └── config.org
+├── etc
+│   └── screenshot.jpeg
 └── init.el
 #+end_src
 ** Completed Features
@@ -29,16 +32,19 @@ The configuration will load up automatically on the initial load of Emacs, and t
 - Project Management
 - File Management
 - Github Integration
-- LSP
-  + Python
-  + Rust, TOML
-  + Java
-  + C, C++
-  + JavaScript, TypeScript
-  + HTML, CSS
+- [[https://emacs-lsp.github.io/lsp-mode/][LSP]]
+  + [[https://emacs-lsp.github.io/lsp-pyright/][Python]]
+  + [[https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/][Rust]], [[https://emacs-lsp.github.io/lsp-mode/page/lsp-toml/][TOML]]
+  + [[https://emacs-lsp.github.io/lsp-java/][Java]]
+  + [[https://emacs-lsp.github.io/lsp-mode/page/lsp-clangd/][C]], [[https://emacs-lsp.github.io/lsp-mode/page/lsp-clangd/][C++]]
+  + JavaScript, TypeScript (jsts-ls)
+  + [[https://emacs-lsp.github.io/lsp-mode/page/lsp-clangd/][HTML]], CSS (css-ls)
 - Dashboard
+  
 ** Ongoing Additions
+Note: As Emacs has been configured to a minimal IDE build, ongoing configurations of other features will take a back seat as I refocus myself to my other [[https://github.com/Pixalesce?tab=repositories][projects]].
 - LSP
+- Terminal Configuration
 - Notion Integration
 - Email Integration
 - Org Mode Setup
