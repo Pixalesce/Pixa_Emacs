@@ -46,6 +46,7 @@ Note: As Emacs has been configured to a minimal IDE build, ongoing configuration
 - LSP
 - Terminal Configuration
 - Notion Integration
+- PDF View Configuration
 - Email Integration
 - Org Mode Setup
 - Quality of Life
