@@ -15,8 +15,8 @@
   - [[#load-evil-mode][Load Evil Mode]]
   - [[#completion-support-ivy][Completion Support (Ivy)]]
   - [[#helpful][Helpful]]
-  - [[#lsp-initialisation][LSP Initialisation]]
   - [[#keybindings][Keybindings]]
+  - [[#lsp-initialisation][LSP Initialisation]]
   - [[#syntax-highlighting-treesitter][Syntax Highlighting (TreeSitter)]]
 - [[#projectile][Projectile]]
 - [[#github-integration][Github Integration]]
@@ -177,10 +177,40 @@
   ([remap describe-variable] . 'counsel-describe-variable)
   ([remap describe-key] . 'helpful-key))
 #+end_src
+** Keybindings
+*** General
+#+begin_src emacs-lisp
+  (use-package general
+    :config
+    (general-create-definer pix/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
+    (general-create-definer pix/ctrl-c-keys
+      :prefix "C-c"))
+
+    (pix/leader-keys
+      "t"  '(:ignore t :wk "toggles")
+      "tt" '(counsel-load-theme :wk "choose theme"))
+#+end_src
+*** Buffers
+#+begin_src emacs-lisp
+(general-define-key
+  "C-M-h" 'counsel-switch-buffer)
+#+end_src
+*** File Navigation
+#+begin_src emacs-lisp
+
+#+end_src
+*** Misc
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make ESC quit prompts
+#+end_src
 ** LSP Initialisation
 *** Base set up
 Booting up LSP mode
 #+begin_src emacs-lisp
+  (setq lsp-file-watch-threshold 12)
   (defun pix/lsp-mode-setup ()
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
@@ -275,9 +305,7 @@ Booting up LSP mode
       :config
       (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-    (use-package #+begin_src rustic
-
-  ,#+end_srcrustic
+    (use-package rustic
       :after lsp
       :mode "\\.rs\\'"
       :hook (rustic-mode . lsp-deferred))
@@ -331,6 +359,7 @@ Booting up LSP mode
 *** JavaScript
 #+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-hook 'js2-mode-hook #'lsp-deferred)
   (add-hook 'mhtml-mode-hook #'lsp-deferred)
 #+end_src
 *** Typescript
@@ -353,35 +382,6 @@ Booting up LSP mode
 #+begin_src emacs-lisp
   (add-hook 'c-mode-hook #'lsp-deferred)
   ;; (add-hook 'c++-mode-hook #'lsp-deferred)
-#+end_src
-** Keybindings
-*** General
-#+begin_src emacs-lisp
-  (use-package general
-    :config
-    (general-create-definer pix/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC") ;;Cntrl-<SPACE> to access leader in insert mode
-    (general-create-definer pix/ctrl-c-keys
-      :prefix "C-c"))
-
-    (pix/leader-keys
-      "t"  '(:ignore t :wk "toggles")
-      "tt" '(counsel-load-theme :wk "choose theme"))
-#+end_src
-*** Buffers
-#+begin_src emacs-lisp
-(general-define-key
-  "C-M-h" 'counsel-switch-buffer)
-#+end_src
-*** File Navigation
-#+begin_src emacs-lisp
-
-#+end_src
-*** Misc
-#+begin_src emacs-lisp
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make ESC quit prompts
 #+end_src
 ** Syntax Highlighting (TreeSitter)
 #+begin_src emacs-lisp
