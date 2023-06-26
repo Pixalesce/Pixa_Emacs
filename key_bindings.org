@@ -1,0 +1,192 @@
+#+TITLE: Customised Keybindings in PixaEmacs
+#+AUTHOR: Pixalesce
+#+EMAIL: pixalesce@gmail.com
+#+DATE: 26 Jun '23
+
+This file is created as a quick reference to the custom keybindings that I during my day-to-day use of Emacs. Please go to the relevant sections in =config/config.org= to customise your own configuration.
+
+* Table of Contents ::toc::
+- [[#lsp][LSP]]
+- [[#dashboard][Dashboard]]
+- [[#forge][Forge]]
+- [[#rustic][Rustic]]
+- [[#org-mode][Org Mode]]
+- [[#window-operators][Window Operators]]
+
+* LSP
+| keybinding  | description                                         |
+|-------------+-----------------------------------------------------|
+| SPC-l       | Show LSP operators                                  |
+| SPC-lm      | Toggle LSP Mode                                     |
+| SPC-lo      | Toggle LSP Org Mode                                 |
+| SPC-lr      | Rename the symbol and all references to it          |
+| SPC-lh      | Highlights all references to symbol in document     |
+| SPC-l C-s   | Show LSP server operators                           |
+| SPC-l C-s i | Interactively install or re-install a server        |
+| SPC-l C-s d | Interactively uninstall a server                    |
+| SPC-l C-s u | Interactively update a server                       |
+| SPC-l C-w   | Show LSP workspace operators                        |
+| SPC-l C-w a | Add PROJECT-ROOT to the list of LSP tracked folders |
+| SPC-l C-w o | Open the directory located at PROJECT-ROOT          |
+| SPC-l C-w D | Delete all LSP tracked folders                      |
+| SPC-l C-w d | Delete LSP tracked folder                           |
+| SPC-l C-w l | Show log buffer of WORKSPACE                        |
+| SPC-l C-w R | Restart the WORKSPACE and the language server       |
+|-------------+-----------------------------------------------------|
+#+begin_src emacs-lisp
+  (pix/leader-keys
+    "l" '(:ignore t :wk "LSP Operators")
+    "lm" '(lsp-mode :wk "Toggle LSP Mode")
+    "lo" '(lsp-org :wk "Toggle LSP Org Mode")
+    "lr" '(lsp-rename :wk "Rename the symbol (and all references to it)")
+    "lh" '(lsp-document-highlight :wk "Highlights all references to symbol in document") 
+    "l C-s" '(:ignore t :wk "Server Operators")
+    "l C-s i" '(lsp-install-server :wk "Interactively install or re-install a server")
+    "l C-s d" '(lsp-uninstall-server :wk "Interactively uninstall or a server")
+    "l C-s u" '(lsp-update-server :wk "Interactively update or a server")
+    "l C-w" '(:ignore t :wk "Workspace Operators")
+    "l C-w a" '(lsp-workspace-folders-add :wk "Add PROJECT-ROOT to the list of LSP tracked folders")
+    "l C-w o" '(lsp-workspace-folders-open :wk "Open the directory located at PROJECT-ROOT")
+    "l C-w D" '(lsp-workspace-remove-all-folders :wk "Delete all LSP tracked folders")
+    "l C-w d" '(lsp-workspace-folders-remove :wk "Delete PROJECT-ROOT from list of LSP tracked folders")
+    "l C-w l" '(lsp-workspace-show-log :wk "Show log buffer of WORKSPACE")
+    "l C-w R" '(lsp-workspace-restart :wk "Restart the WORKSPACE and the language server"))
+#+end_src
+
+* Dashboard
+| keybinding | description                           |
+|------------+---------------------------------------|
+| SPC-d      | Show dashboard operators              |
+| SPC-db     | Jump to bookmarks section             |
+| SPC-dB     | Remove a bookmark                     |
+| SPC-dp     | Jump to projects section              |
+| SPC-dP     | Remove a project                      |
+| SPC-dr     | Jump to recents section               |
+| SPC-dR     | Remove a recent item                  |
+| SPC-dj     | Jump to previous section on dashboard |
+| SPC-dk     | Jump to next section on dashboard     |
+| SPC-dl     | RET in dashboard buffer               |
+| SPC-do     | Open or refresh dashboard buffer      |
+|------------+---------------------------------------|
+#+begin_src emacs-lisp
+  (pix/leader-keys
+    "d" '(:ignore t :wk "Dashboard Operators")
+    "db" '(dashboard-jump-to-bookmarks :wk "Jump to bookmarks")
+    "dB" '(dashboard-remove-item-bookmarks:wk "Remove a bookmark")
+    "dp" '(dashboard-jump-to-projects :wk "Jump to projects")
+    "dP" '(dashboard-remove-item-projects :wk "Remove a project")
+    "dr" '(dashboard-jump-to-recents :wk "Jump to recents")
+    "dR" '(dashboard-remove-item-recentf :wk "Remove a recent item")
+    "dj" '(dashboard-next-section :wk "Jump to next section")
+    "dk" '(dashboard-previous-section :wk "Jump to previous section")
+    "dl" '(dashboard-return :wk "RET in dashboard buffer")
+    "do" '(dashboard-open :wk "Open / Refresh dashboard"))
+#+end_src
+
+* Forge
+| keybinding | description                                  |
+|------------+----------------------------------------------|
+| SPC C-f    | show forge operators                         |
+| SPC C-f f  | fork current repository and add it as remote |
+| SPC C-f m  | merge current pull request                   |
+| SPC C-f p  | pull from repository                         |
+| SPC C-f c  | show forge create operations                 |
+| SPC C-f ci | create new issue                             |
+| SPC C-f cp | create new pull request                      |
+| SPC C-f l  | show forge list operations                   |
+| SPC C-f lp | list pull requests                           |
+| SPC C-f li | list pull issues                             |
+| SPC C-f ln | list pull notifications                      |
+|------------+----------------------------------------------|
+#+begin_src emacs-lisp
+(pix/leader-keys
+  "c-f" '(:ignore t :wk "forge operators")
+  "c-f p" '(forge-pull :wk "pull from repo")
+  "c-f m" '(forge-merge :wk "merge current pull request")
+  "c-f f" '(forge-fork :wk "fork current repo and add it as remote")
+  "c-f l" '(:ignore t :wk "forge list operations")
+  "c-f lp" '(forge-list-pullreqs :wk "list pull requests")
+  "c-f li" '(forge-list-issues :wk "list issues")
+  "c-f ln" '(forge-list-notifications :wk "list notifications")
+  "c-f c" '(:ignore t :wk "forge create operations")
+  "c-f ci" '(forge-create-issues :wk "create issues")
+  "c-f cp" '(forge-create-pullreq :wk "create pull request"))
+#+end_src
+
+* Rustic
+| keybinding | description                               |
+|------------+-------------------------------------------|
+| SPC r      | Show rustic operators                     |
+| SPC rm     | Toggle rustic mode                        |
+| SPC ra     | Add crate to Cargo.toml using 'cargo add' |
+| SPC rb     | Cargo build                               |
+| SPC rB     | Cargo bench                               |
+| SPC rc     | Cargo clippy                              |
+| SPC rd     | Open Cargo.toml                           |
+| SPC rf     | Format current buffer using rustfmt       |
+| SPC rF     | Cargo fix                                 |
+| SPC ri     | Cargo init                                |
+| SPC rn     | Cargo new                                 |
+| SPC rr     | Cargo run                                 |
+| SPC rR     | Cargo run but for interactive programs    |
+| SPC rs     | Cargo spellcheck                          |
+| SPC rt     | Cargo test                                |
+|------------+-------------------------------------------|
+#+begin_src emacs-lisp
+  (pix/leader-keys
+    "r" '(:ignore t :wk "rustic operators")
+    "rm" '(rustic-mode :wk "toggle rustic mode")
+    "ra" '(rustic-cargo-add :wk "add crate to Cargo.toml using 'cargo add'")
+    "rb" '(rustic-cargo-build :wk "cargo build")
+    "rB" '(rustic-cargo-bench :wk "cargo bench")
+    "rc" '(rustic-cargo-clippy :wk "cargo clippy")
+    "rd" '(rustic-open-dependency-file :wk "open Cargo.toml")
+    "rf" '(rustic-format-buffer :wk "format current buffer using rustfmt")
+    "rF" '(rustic-rustfix :wk "cargo fix")
+    "ri" '(rustic-cargo-init :wk "cargo init")
+    "rn" '(rustic-cargo-new :wk "cargo new")
+    "rr" '(rustic-cargo-run :wk "cargo run")
+    "rR" '(rustic-cargo-comint-run :wk "cargo run but for interactive programs")
+    "rs" '(rustic-cargo-spellcheck :wk "cargo spellcheck")
+    "rt" '(rustic-cargo-test-run :wk "cargo test"))
+#+end_src
+
+* Org Mode
+| keybinding | description                                  |
+|------------+----------------------------------------------|
+|------------+----------------------------------------------|
+#+begin_src emacs-lisp
+(pix/leader-keys
+  )
+#+end_src
+
+* Window Operators
+| keybinding | description                   |
+|------------+-------------------------------|
+| SPC w      | Show window operators         |
+| SPC ws     | Split window horizontally     |
+| SPC wv     | Split window vertically       |
+| SPC wh     | Select window to the left     |
+| SPC wj     | Select window to the bottom   |
+| SPC wk     | Select window to the top      |
+| SPC wl     | Select window to the right    |
+| SPC wc     | Detele current window         |
+| SPC wr     | Rotate windows clockwise      |
+| SPC wR     | Rotate windows anti-clockwise |
+| SPC ww     | Toggle window split           |
+|------------+-------------------------------|
+#+begin_src emacs-lisp
+  (pix/leader-keys
+     "w" '(:ignore t :wk "window operators")
+     "ws" '(evil-window-split :wk "split window horizontally")
+     "wv" '(evil-window-vsplit :wk "split window vertically")
+     "wh" '(evil-window-left :wk "select window on the left")
+     "wk" '(evil-window-up :wk "select window on the top")
+     "wj" '(evil-window-down :wk "select window on the bottom")
+     "wl" '(evil-window-right :wk "select window on the right")
+     "wc" '(evil-window-delete :wk "delete current window")
+     "wr" '(evil-window-rotate-downwards :wk "rotate window clockwise")
+     "wR" '(evil-window-rotate-upwards :wk "rotate window anti-clockwise")
+     "ww" '(toggle-window-split :wk "toggle window split"))
+#+end_src
+
