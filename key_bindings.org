@@ -7,6 +7,7 @@ This file is created as a quick reference to the custom keybindings that I durin
 
 * Table of Contents ::toc::
 - [[#lsp][LSP]]
+- [[#eldoc][Eldoc]]
 - [[#dashboard][Dashboard]]
 - [[#forge][Forge]]
 - [[#rustic][Rustic]]
@@ -51,6 +52,23 @@ This file is created as a quick reference to the custom keybindings that I durin
     "l C-w d" '(lsp-workspace-folders-remove :wk "Delete PROJECT-ROOT from list of LSP tracked folders")
     "l C-w l" '(lsp-workspace-show-log :wk "Show log buffer of WORKSPACE")
     "l C-w R" '(lsp-workspace-restart :wk "Restart the WORKSPACE and the language server"))
+#+end_src
+
+* Eldoc
+| keybinding | description                           |
+|------------+---------------------------------------|
+| SPC-e      | Show Eldoc Operators                  |
+| SPC-em     | Toggle Eldoc Mode                     |
+| SPC-ed     | Display Eldoc documentation in buffer |
+| SPC-ep     | Document thing at point               |
+|------------+---------------------------------------|
+#+begin_src emacs-lisp
+  (pix/leader-keys
+    "e" '(:ignore t :wk "Show Eldoc Operators")
+    "em" '(global-eldoc-mode :wk "Toggle Eldoc Mode")
+    "ed" '(eldoc-doc-buffer :wk "Display Eldoc documentation in buffer")
+    "ep" '(eldoc-print-current-symbol-info :wk "Document thing at point")
+  )
 #+end_src
 
 * Dashboard

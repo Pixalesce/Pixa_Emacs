@@ -57,6 +57,7 @@
 #+begin_src emacs-lisp
   (add-to-list 'image-types 'svg)
   (add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; maximises window frame
+  (setq doc-view-resolution 400)
 #+end_src
 ** Set Custom Variables Save Path
 #+begin_src emacs-lisp
@@ -206,6 +207,15 @@
 #+begin_src emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit) ; Make ESC quit prompts
 #+end_src
+*** Eldoc
+#+begin_src emacs-lisp
+  (pix/leader-keys
+    "e" '(:ignore t :wk "Show Eldoc Operators")
+    "em" '(global-eldoc-mode :wk "Toggle Eldoc Mode")
+    "ed" '(eldoc-doc-buffer :wk "Display Eldoc documentation in buffer")
+    "ep" '(eldoc-print-current-symbol-info :wk "Document thing at point")
+  )
+#+end_src
 ** LSP Initialisation
 *** Base set up
 Booting up LSP mode
@@ -270,7 +280,8 @@ Booting up LSP mode
     :custom
     (lsp-ui-peek-always-show t)
     ;; (lsp-ui-sideline-show-hover t)
-    (setq lsp-ui-doc-position 'bottom))
+    (setq lsp-ui-doc-position 'bottom)
+    (setq lsp-ui-doc-max-height 3))
 #+end_src
 *** LSP-treemacs
 #+begin_src emacs-lisp
@@ -290,6 +301,7 @@ Booting up LSP mode
       ;; what to use when checking on-save. "check" is default, I prefer clippy
       (lsp-rust-analyzer-cargo-watch-command "clippy")
       (lsp-eldoc-render-all t)
+      (eldoc-idle-delay 0)
       (lsp-idle-delay 0.0)
       ;; enable / disable the hints as you prefer:
       (lsp-rust-analyzer-server-display-inlay-hints t)
@@ -542,46 +554,47 @@ Defining fonts that Emacs will use
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp
-  (use-package dashboard
-    :ensure t
-    :init
-    (progn
-      (setq dashboard-items '((bookmarks . 3)
-                              (recents . 5)
-                              (projects . 3)
-                              (agenda . 10)))
-      (setq dashboard-show-shortcuts nil
-            dashboard-center-content t
-            dashboard-banner-logo-title "This is just a dashboard, the real work has yet to start!"
-            dashboard-display-icons-p t
-            dashboard-set-file-icons t
-            dashboard-set-heading-icons t
-            dashboard-set-init-info t
-            dashboard-startup-banner (expand-file-name "config/assets/Pixalesce_banner.png" user-emacs-directory)
-            dashboard-item-names '(("Recent Files:" . "Recents:")
-                                   ("Bookmarks:" . "Pinned:"))
-            dashboard-footer-icon nil)
-     )
-    :config
-    (dashboard-setup-startup-hook))
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+    (use-package dashboard
+      :ensure t
+      :init
+      (progn
+        (setq dashboard-items '((bookmarks . 3)
+                                (recents . 5)
+                                (projects . 3)
+                                (agenda . 10)))
+        (setq dashboard-show-shortcuts nil
+              dashboard-center-content t
+              dashboard-banner-logo-title "This is just a dashboard, the real work has yet to start!"
+              dashboard-display-icons-p t
+              dashboard-set-file-icons t
+              dashboard-set-heading-icons t
+              dashboard-set-init-info t
+              dashboard-startup-banner (expand-file-name "config/assets/Pixalesce_banner.png" user-emacs-directory)
+              dashboard-item-names '(("Recent Files:" . "Recents:")
+                                     ("Bookmarks:" . "Pinned:"))
+              dashboard-footer-icon nil)
+       )
+      :config
+      (dashboard-setup-startup-hook))
+    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-  (setq bookmark-file "~/.emacs.d/logs/bookmarks")
+    (setq bookmark-file "~/.emacs.d/logs/bookmarks")
 
-  (pix/leader-keys
-    "d" '(:ignore t :wk "Dashboard Operators")
-    "db" '(dashboard-jump-to-bookmarks :wk "Jump to bookmarks")
-    "dB" '(dashboard-remove-item-bookmarks:wk "Remove a bookmark")
-    "dp" '(dashboard-jump-to-projects :wk "Jump to projects")
-    "dP" '(dashboard-remove-item-projects :wk "Remove a project")
-    "dr" '(dashboard-jump-to-recents :wk "Jump to recents")
-    "dR" '(dashboard-remove-item-recentf :wk "Remove a recent item")
-    "dn" '(dashboard-next-section :wk "Jump to next section")
-    "dp" '(dashboard-previous-section :wk "Jump to previous section")
-    "dl" '(dashboard-return :wk "RET in dashboard buffer")
-    "do" '(dashboard-open :wk "Open / Refresh dashboard"))
+    (pix/leader-keys
+      "d" '(:ignore t :wk "Dashboard Operators")
+      "db" '(dashboard-jump-to-bookmarks :wk "Jump to bookmarks")
+      "dB" '(dashboard-remove-item-bookmarks:wk "Remove a bookmark")
+      "dp" '(dashboard-jump-to-projects :wk "Jump to projects")
+      "dP" '(dashboard-remove-item-projects :wk "Remove a project")
+      "dr" '(dashboard-jump-to-recents :wk "Jump to recents")
+      "dR" '(dashboard-remove-item-recentf :wk "Remove a recent item")
+      "dn" '(dashboard-next-section :wk "Jump to next section")
+      "dp" '(dashboard-previous-section :wk "Jump to previous section")
+      "dl" '(dashboard-return :wk "RET in dashboard buffer")
+      "do" '(dashboard-open :wk "Open / Refresh dashboard")
+      "m" '(toggle-menu-bar-mode-from-frame :wk "Toggle menu bar"))
 
-  (add-hook 'server-after-make-frame-hook 'dashboard-open)
+    (add-hook 'server-after-make-frame-hook 'dashboard-open)
 #+end_src
 * ORG MODE
 ** Basic Setup
