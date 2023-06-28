@@ -39,6 +39,7 @@
   - [[#org-babel][Org Babel]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-mode-bullets][Enabling Org Mode Bullets]]
+- [[#doc-view][Doc View]]
 - [[#which-key][WHICH-KEY]]
 - [[#quality-of-life][QUALITY OF LIFE]]
   - [[#minibuffer-prompt-history][Minibuffer Prompt History]]
@@ -52,12 +53,12 @@
   - [[#spell-check][Spell Check]]
   - [[#scroll-settings][Scroll Settings]]
   - [[#window-toggle][Window Toggle]]
+  - [[#highlight-indentation][Highlight Indentation]]
 
 * TOP LEVEL PROGRAMS TO LOAD
 #+begin_src emacs-lisp
   (add-to-list 'image-types 'svg)
   (add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; maximises window frame
-  (setq doc-view-resolution 400)
 #+end_src
 ** Set Custom Variables Save Path
 #+begin_src emacs-lisp
@@ -93,6 +94,7 @@
                     eshell-mode
                     git-rebase-mode
                     erc-mode
+                    doc-view-mode
                     sauron-mode
                     term-mode))
       (add-to-list 'evil-emacs-state-modes mode)))
@@ -123,7 +125,7 @@
     :config
     (setq evil-collection-mode-list '(dashboard dired ibuffer))
     (evil-collection-init))
-  
+
   ; Enables redo functionality
   (use-package undo-tree
     :ensure t
@@ -263,7 +265,7 @@ Booting up LSP mode
            ("C-k" . company-select-previous)
            ("C-h" . company-select-next))
           (:map lsp-mode-map
-           ("<tab>" . company-indent-or-complete-common))
+           ("<tab>" . company-indent-or-complete-common)))
     :custom
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0))
@@ -525,7 +527,9 @@ Defining fonts that Emacs will use
     :init (doom-modeline-mode 1)
     :custom ((doom-modeline-height 40))
     :config
-   (setq doom-modeline-modal-icon nil))
+   (setq doom-modeline-modal-icon nil)
+   (setq doom-modeline--pdf-pages t)
+   (setq doom-modeline--battery-status t))
 #+end_src
 ** Disabling Start Up Message Add Warning
 #+begin_src emacs-lisp
@@ -613,7 +617,9 @@ Defining fonts that Emacs will use
     :hook (org-mode . pix/org-mode-setup)
     :config
     (setq org-ellipsis " ↯"
-          org-hide-emphasis-markers t))
+          org-hide-emphasis-markers t)
+    :bind (:map org-mode-map (
+                 "C-c C-v C-v" . org-babel-execute-src-block)))
 #+end_src
 ** Org Font
 #+begin_src emacs-lisp
@@ -698,6 +704,20 @@ check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][support
     :hook (org-mode . org-bullets-mode)
     :custom
     (org-bullets-bullet-list '("✿" "⛿" "⛾" "⚘" "⅌" "☫" "❦" "❀" "♨" "☃" "⚛" "☢" "☣" "☠" "㊙" "㊗" "🌚")))
+#+end_src
+* Doc View
+#+begin_src emacs-lisp
+  (setq doc-view-resolution 400)
+  (use-package doc-view
+    :bind (
+           :map doc-view-mode-map  
+           ("C-j" . doc-view-scroll-up-or-next-page)
+           ("C-k" . doc-view-scroll-down-or-previous-page)
+           ("C-h" . doc-view-previous-line-or-previous-page)
+           ("C-l" . doc-view-next-line-or-next-page)
+           ("<tab>" . doc-view-first-page)
+           ("<backtab>" . doc-view-last-page)
+           ("C-C" . doc-view-center-page-horizontally)))
 #+end_src
 * WHICH-KEY
 #+begin_src emacs-lisp
@@ -815,4 +835,11 @@ check [[https://orgmode.org/worg/org-contrib/babel/languages/index.html][support
      "wr" '(evil-window-rotate-downwards :wk "rotate window clockwise")
      "wR" '(evil-window-rotate-upwards :wk "rotate window anti-clockwise")
      "ww" '(toggle-window-split :wk "toggle window split"))
+#+end_src
+** Highlight Indentation
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/packages/indent_guide/")
+(require 'indent-guide)
+(add-to-list 'load-path "~/.emacs.d/packages/highlight_indentation/")
+(require 'highlight-indentation)
 #+end_src

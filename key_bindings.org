@@ -13,6 +13,7 @@ This file is created as a quick reference to the custom keybindings that I durin
 - [[#rustic][Rustic]]
 - [[#org-mode][Org Mode]]
 - [[#window-operators][Window Operators]]
+- [[#doc-view][Doc View]]
 
 * LSP
 | keybinding  | description                                         |
@@ -208,3 +209,23 @@ This file is created as a quick reference to the custom keybindings that I durin
      "ww" '(toggle-window-split :wk "toggle window split"))
 #+end_src
 
+* Doc View
+| keybinding | description                                  |
+|------------+----------------------------------------------|
+|------------+----------------------------------------------|
+#+begin_src emacs-lisp
+  (use-package doc-view
+    :bind (
+           :map doc-view-mode-map  
+           ("C-j" . doc-view-scroll-up-or-next-page)
+           ("C-k" . doc-view-scroll-down-or-previous-page)
+           ("C-h" . doc-view-first-page)
+           ("C-l" . doc-view-last-page)
+           ("TAB" . doc-view-previous-line-or-previous-page)
+           ("S-TAB" . doc-view-next-line-or-next-page)
+           ("b" . doc-view-bookmark-make-record)
+           ("C-b" . doc-view-bookmark-jump)
+           ("C" . doc-view-center-page-horizontally)
+           ("C-f" . doc-view-goto-page)))
+
+#+end_src
