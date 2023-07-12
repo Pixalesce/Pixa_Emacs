@@ -18,6 +18,7 @@ recentf
 eclipse.jdt.ls
 workspace
 
+org-roam.db
 forge-database.sqlite
 *.*~
 
